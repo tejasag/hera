@@ -1,17 +1,16 @@
+use super::token::Token;
 use std::collections::HashMap;
 
-use super::token::{Token, TokenType};
-
 lazy_static! {
-    static ref KEYWORDS: HashMap<&'static str, TokenType> = {
+    static ref KEYWORDS: HashMap<&'static str, Token> = {
         let mut keywords = HashMap::new();
-        keywords.insert("fn", TokenType::FUNCTION);
-        keywords.insert("let", TokenType::LET);
+        keywords.insert("fn", Token::FUNCTION);
+        keywords.insert("let", Token::LET);
         keywords
     };
 }
 
-pub fn lookup_indentifier(i: &str) -> Option<&'static TokenType> {
+pub fn lookup_indentifier(i: &str) -> Option<&'static Token> {
     KEYWORDS.get(i)
 }
 
@@ -38,57 +37,41 @@ impl Lexer {
         self.skip_whitespace();
 
         match self.ch {
-            '=' => tok = self.new_token(TokenType::ASSIGN, self.ch),
-            ';' => {
-                tok = self.new_token(TokenType::SEMICOLON, self.ch);
-            }
-            '(' => tok = self.new_token(TokenType::LPAREN, self.ch),
-            ')' => tok = self.new_token(TokenType::RPAREN, self.ch),
-            '{' => tok = self.new_token(TokenType::LBRACE, self.ch),
-            '}' => tok = self.new_token(TokenType::RBRACE, self.ch),
-            ',' => tok = self.new_token(TokenType::COMMA, self.ch),
-            '+' => tok = self.new_token(TokenType::PLUS, self.ch),
-            '\u{0}' => {
-                tok = Token {
-                    token_type: TokenType::EOF,
-                    literal: "",
-                }
-            }
+            '=' => tok = Token::ASSIGN,
+            ';' => tok = Token::SEMICOLON,
+            '(' => tok = Token::LPAREN,
+            ')' => tok = Token::RPAREN,
+            '{' => tok = Token::LBRACE,
+            '}' => tok = Token::RBRACE,
+            ',' => tok = Token::COMMA,
+            '+' => tok = Token::PLUS,
+            '-' => tok = Token::MINUS,
+            '!' => tok = Token::BANG,
+            '*' => tok = Token::ASTERISK,
+            '/' => tok = Token::SLASH,
+            '<' => tok = Token::LT,
+            '>' => tok = Token::GT,
+            '\u{0}' => tok = Token::EOF,
             _ => {
                 if is_letter(self.ch) {
                     let i = self.read_identifier();
-                    let t_type = match lookup_indentifier(i.as_str()) {
+                    tok = match lookup_indentifier(i.as_str()) {
                         Some(a) => a.to_owned(),
-                        _ => TokenType::IDENT,
-                    };
-                    tok = Token {
-                        token_type: t_type,
-                        literal: Box::leak(i.into_boxed_str()),
+                        _ => Token::IDENT(i),
                     };
                     return tok;
                 } else if is_numeric(self.ch) {
                     let i = self.read_number();
-                    tok = Token {
-                        token_type: TokenType::INT,
-                        literal: Box::leak(i.into_boxed_str()),
-                    };
+                    tok = Token::INT(i);
                     return tok;
                 } else {
-                    tok = self.new_token(TokenType::ILLEGAL, self.ch)
+                    tok = Token::ILLEGAL;
                 }
             }
         };
 
         &self.read_char();
         tok
-    }
-
-    pub fn new_token<'a>(&self, token_type: TokenType, ch: char) -> Token<'a> {
-        let ch_string: String = ch.to_string();
-        Token {
-            token_type,
-            literal: Box::leak(ch_string.into_boxed_str()),
-        }
     }
 
     pub fn read_identifier(&mut self) -> String {

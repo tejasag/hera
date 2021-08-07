@@ -3,15 +3,22 @@ use std::fmt;
 use fmt::Formatter;
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum TokenType {
+pub enum Token {
     ILLEGAL,
     EOF,
 
-    IDENT,
-    INT,
+    IDENT(String),
+    INT(String),
 
     ASSIGN,
     PLUS,
+    MINUS,
+    BANG,
+    ASTERISK,
+    SLASH,
+
+    LT,
+    GT,
 
     COMMA,
     SEMICOLON,
@@ -25,14 +32,16 @@ pub enum TokenType {
     LET,
 }
 
+/*
 #[derive(Debug, PartialEq, Clone)]
 pub struct Token<'a> {
     pub token_type: TokenType,
     pub literal: &'a str,
 }
 
-impl<'a> fmt::Display for Token<'a> {
+impl fmt::Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "[{:?}] lit: '{}'", self.token_type, self.literal)
     }
 }
+*/
