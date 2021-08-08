@@ -15,6 +15,15 @@ let add = fn(x, y) {
 !-/*5;
 5 < 10 > 5;
 
+if (5 < 10) {
+    return true;
+} else {
+    return false;
+}
+
+10 == 10;
+9 != 10;
+
 let result = add(five, ten);
 ";
 
@@ -56,6 +65,31 @@ let result = add(five, ten);
         INT("10".to_string()),
         GT,
         INT("5".to_string()),
+        SEMICOLON,
+        IF,
+        LPAREN,
+        INT("5".to_string()),
+        LT,
+        INT("10".to_string()),
+        RPAREN,
+        LBRACE,
+        RETURN,
+        TRUE,
+        SEMICOLON,
+        RBRACE,
+        ELSE,
+        LBRACE,
+        RETURN,
+        FALSE,
+        SEMICOLON,
+        RBRACE,
+        INT("10".to_string()),
+        EQ,
+        INT("10".to_string()),
+        SEMICOLON,
+        INT("9".to_string()),
+        NOT_EQ,
+        INT("10".to_string()),
         SEMICOLON,
         LET,
         IDENT("result".to_string()),

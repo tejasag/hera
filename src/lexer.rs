@@ -6,6 +6,11 @@ lazy_static! {
         let mut keywords = HashMap::new();
         keywords.insert("fn", Token::FUNCTION);
         keywords.insert("let", Token::LET);
+        keywords.insert("true", Token::TRUE);
+        keywords.insert("false", Token::FALSE);
+        keywords.insert("if", Token::IF);
+        keywords.insert("else", Token::ELSE);
+        keywords.insert("return", Token::RETURN);
         keywords
     };
 }
@@ -37,7 +42,14 @@ impl Lexer {
         self.skip_whitespace();
 
         match self.ch {
-            '=' => tok = Token::ASSIGN,
+            '=' => {
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    tok = Token::EQ;
+                } else {
+                    tok = Token::ASSIGN;
+                }
+            }
             ';' => tok = Token::SEMICOLON,
             '(' => tok = Token::LPAREN,
             ')' => tok = Token::RPAREN,
@@ -46,7 +58,14 @@ impl Lexer {
             ',' => tok = Token::COMMA,
             '+' => tok = Token::PLUS,
             '-' => tok = Token::MINUS,
-            '!' => tok = Token::BANG,
+            '!' => {
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    tok = Token::NOT_EQ;
+                } else {
+                    tok = Token::BANG;
+                }
+            }
             '*' => tok = Token::ASTERISK,
             '/' => tok = Token::SLASH,
             '<' => tok = Token::LT,
@@ -93,6 +112,14 @@ impl Lexer {
     pub fn skip_whitespace(&mut self) {
         while self.ch == ' ' || self.ch == '\t' || self.ch == '\n' || self.ch == '\r' {
             self.read_char()
+        }
+    }
+
+    pub fn peek_char(&self) -> char {
+        if self.read_position >= self.input.len() {
+            0 as char
+        } else {
+            self.input.chars().nth(self.read_position).unwrap()
         }
     }
 }

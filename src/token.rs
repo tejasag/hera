@@ -1,6 +1,4 @@
-use std::fmt;
-
-use fmt::Formatter;
+use std::fmt::{self, Formatter};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
@@ -19,6 +17,8 @@ pub enum Token {
 
     LT,
     GT,
+    EQ,
+    NOT_EQ,
 
     COMMA,
     SEMICOLON,
@@ -30,6 +30,11 @@ pub enum Token {
 
     FUNCTION,
     LET,
+    TRUE,
+    FALSE,
+    IF,
+    ELSE,
+    RETURN,
 }
 
 /*
@@ -38,10 +43,10 @@ pub struct Token<'a> {
     pub token_type: TokenType,
     pub literal: &'a str,
 }
+*/
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "[{:?}] lit: '{}'", self.token_type, self.literal)
+        write!(f, "{}", self)
     }
 }
-*/
