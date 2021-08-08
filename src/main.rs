@@ -1,9 +1,6 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-#[macro_use]
-extern crate lazy_static;
-
 pub mod lexer;
 pub mod repl;
 pub mod token;

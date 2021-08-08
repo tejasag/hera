@@ -1,7 +1,7 @@
 use super::token::Token;
 use std::collections::HashMap;
 
-lazy_static! {
+lazy_static::lazy_static! {
     static ref KEYWORDS: HashMap<&'static str, Token> = {
         let mut keywords = HashMap::new();
         keywords.insert("fn", Token::FUNCTION);
