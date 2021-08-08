@@ -38,53 +38,50 @@ impl Lexer {
     }
 
     pub fn next_token(&mut self) -> Token {
-        let tok: Token;
         self.skip_whitespace();
 
-        match self.ch {
+        let tok: Token = match self.ch {
             '=' => {
                 if self.peek_char() == '=' {
                     self.read_char();
-                    tok = Token::EQ;
+                    Token::EQ
                 } else {
-                    tok = Token::ASSIGN;
+                    Token::ASSIGN
                 }
             }
-            ';' => tok = Token::SEMICOLON,
-            '(' => tok = Token::LPAREN,
-            ')' => tok = Token::RPAREN,
-            '{' => tok = Token::LBRACE,
-            '}' => tok = Token::RBRACE,
-            ',' => tok = Token::COMMA,
-            '+' => tok = Token::PLUS,
-            '-' => tok = Token::MINUS,
+            ';' => Token::SEMICOLON,
+            '(' => Token::LPAREN,
+            ')' => Token::RPAREN,
+            '{' => Token::LBRACE,
+            '}' => Token::RBRACE,
+            ',' => Token::COMMA,
+            '+' => Token::PLUS,
+            '-' => Token::MINUS,
             '!' => {
                 if self.peek_char() == '=' {
                     self.read_char();
-                    tok = Token::NOT_EQ;
+                    Token::NOT_EQ
                 } else {
-                    tok = Token::BANG;
+                    Token::BANG
                 }
             }
-            '*' => tok = Token::ASTERISK,
-            '/' => tok = Token::SLASH,
-            '<' => tok = Token::LT,
-            '>' => tok = Token::GT,
-            '\u{0}' => tok = Token::EOF,
+            '*' => Token::ASTERISK,
+            '/' => Token::SLASH,
+            '<' => Token::LT,
+            '>' => Token::GT,
+            '\u{0}' => Token::EOF,
             _ => {
                 if is_letter(self.ch) {
                     let i = self.read_identifier();
-                    tok = match lookup_indentifier(i.as_str()) {
+                    match lookup_indentifier(i.as_str()) {
                         Some(a) => a.to_owned(),
                         _ => Token::IDENT(i),
-                    };
-                    return tok;
-                } else if is_numeric(self.ch) {
+                    }
+                } else if self.ch.is_numeric() {
                     let i = self.read_number();
-                    tok = Token::INT(i);
-                    return tok;
+                    Token::INT(i)
                 } else {
-                    tok = Token::ILLEGAL;
+                    Token::ILLEGAL
                 }
             }
         };
@@ -98,15 +95,15 @@ impl Lexer {
         while is_letter(self.ch) {
             self.read_char()
         }
-        self.input.get(pos..self.position).unwrap().to_owned()
+        self.input[pos..self.position].to_owned()
     }
 
     pub fn read_number(&mut self) -> String {
         let pos = self.position;
-        while is_numeric(self.ch) {
+        while self.ch.is_numeric() {
             self.read_char();
         }
-        self.input.get(pos..self.position).unwrap().to_owned()
+        self.input[pos..self.position].to_owned()
     }
 
     pub fn skip_whitespace(&mut self) {
@@ -134,9 +131,5 @@ pub fn New(input: String) -> Lexer {
 }
 
 fn is_letter(ch: char) -> bool {
-    'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
-}
-
-fn is_numeric(ch: char) -> bool {
-    '0' <= ch && ch <= '9'
+    ch.is_ascii_alphabetic() || ch == '_'
 }

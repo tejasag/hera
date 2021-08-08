@@ -10,6 +10,10 @@ pub fn start() {
             .read_line(&mut input_string)
             .ok()
             .expect("Could not take in a string!");
+        if input_string.is_empty() {
+            println!("\nPlease enter valid code.");
+            continue;
+        }
         let mut l = super::lexer::New(input_string);
         let mut tok = l.next_token();
         while tok != Token::EOF {
