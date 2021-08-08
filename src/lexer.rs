@@ -73,13 +73,13 @@ impl Lexer {
             _ => {
                 if is_letter(self.ch) {
                     let i = self.read_identifier();
-                    match lookup_indentifier(i.as_str()) {
+                    return match lookup_indentifier(i.as_str()) {
                         Some(a) => a.to_owned(),
                         _ => Token::IDENT(i),
-                    }
+                    };
                 } else if self.ch.is_numeric() {
                     let i = self.read_number();
-                    Token::INT(i)
+                    return Token::INT(i);
                 } else {
                     Token::ILLEGAL
                 }
