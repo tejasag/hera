@@ -27,6 +27,15 @@ pub struct Lexer {
 }
 
 impl Lexer {
+    pub fn new(input: String) -> Lexer {
+        Lexer {
+            ch: input.chars().nth(0).unwrap(),
+            input,
+            position: 0,
+            read_position: 1,
+        }
+    }
+
     pub fn read_char(&mut self) {
         if self.read_position >= self.input.len() {
             self.ch = 0 as char;
@@ -86,7 +95,7 @@ impl Lexer {
             }
         };
 
-        &self.read_char();
+        self.read_char();
         tok
     }
 
@@ -118,15 +127,6 @@ impl Lexer {
         } else {
             self.input.chars().nth(self.read_position).unwrap()
         }
-    }
-}
-
-pub fn New(input: String) -> Lexer {
-    Lexer {
-        ch: input.chars().nth(0).unwrap(),
-        input,
-        position: 0,
-        read_position: 1,
     }
 }
 
