@@ -1,5 +1,5 @@
 use super::{
-    lexer::New,
+    lexer::Lexer,
     token::Token::{self, *},
 };
 
@@ -103,7 +103,7 @@ let result = add(five, ten);
         SEMICOLON,
     ];
 
-    let mut l = New(input.to_string());
+    let mut l = Lexer::new(input.to_string());
 
     for expect in tests {
         let tok: Token = l.next_token();
