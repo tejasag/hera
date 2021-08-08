@@ -1,4 +1,4 @@
-use std::fmt::{self, Formatter};
+use std::fmt::{self, Debug, Formatter};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
@@ -47,6 +47,6 @@ pub struct Token<'a> {
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{:?}", self)
     }
 }
