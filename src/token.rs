@@ -2,39 +2,39 @@ use std::fmt::{self, Debug, Formatter};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    ILLEGAL,
-    EOF,
+    Illegal,
+    Eof,
 
-    IDENT(String),
-    INT(String),
+    Ident(String),
+    Int(String),
 
-    ASSIGN,
-    PLUS,
-    MINUS,
-    BANG,
-    ASTERISK,
-    SLASH,
+    Assign,
+    Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
 
-    LT,
-    GT,
-    EQ,
-    NOT_EQ,
+    Lt,
+    Gt,
+    Eq,
+    NotEq,
 
-    COMMA,
-    SEMICOLON,
+    Comma,
+    SemiColon,
 
-    RPAREN,
-    LPAREN,
-    LBRACE,
-    RBRACE,
+    RParen,
+    LParen,
+    LBrace,
+    RBrace,
 
-    FUNCTION,
-    LET,
-    TRUE,
-    FALSE,
-    IF,
-    ELSE,
-    RETURN,
+    Function,
+    Let,
+    True,
+    False,
+    If,
+    Else,
+    Return,
 }
 
 /*

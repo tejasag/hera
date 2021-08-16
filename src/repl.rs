@@ -8,10 +8,7 @@ pub fn start() {
         let _ = stdout().flush();
 
         let mut input_string = String::new();
-        stdin()
-            .read_line(&mut input_string)
-            .ok()
-            .expect("Could not take in a string!");
+        stdin().read_line(&mut input_string).ok();
 
         if input_string.is_empty() {
             println!("\nPlease enter valid code.");
@@ -20,7 +17,7 @@ pub fn start() {
         let mut lexer = Lexer::new(input_string);
         let mut token = lexer.next_token();
 
-        while token != Token::EOF {
+        while token != Token::Eof {
             println!("Token: {:?}", token);
 
             token = lexer.next_token();

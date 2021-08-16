@@ -4,13 +4,13 @@ use std::collections::HashMap;
 lazy_static::lazy_static! {
     static ref KEYWORDS: HashMap<&'static str, Token> = {
         let mut keywords = HashMap::new();
-        keywords.insert("fn", Token::FUNCTION);
-        keywords.insert("let", Token::LET);
-        keywords.insert("true", Token::TRUE);
-        keywords.insert("false", Token::FALSE);
-        keywords.insert("if", Token::IF);
-        keywords.insert("else", Token::ELSE);
-        keywords.insert("return", Token::RETURN);
+        keywords.insert("fn", Token::Function);
+        keywords.insert("let", Token::Let);
+        keywords.insert("true", Token::True);
+        keywords.insert("false", Token::False);
+        keywords.insert("if", Token::If);
+        keywords.insert("else", Token::Else);
+        keywords.insert("return", Token::Return);
         keywords
     };
 }
@@ -29,7 +29,7 @@ pub struct Lexer {
 impl Lexer {
     pub fn new(input: String) -> Lexer {
         Lexer {
-            ch: input.chars().nth(0).unwrap(),
+            ch: input.chars().next().unwrap(),
             input,
             position: 0,
             read_position: 1,
@@ -53,44 +53,44 @@ impl Lexer {
             '=' => {
                 if self.peek_char() == '=' {
                     self.read_char();
-                    Token::EQ
+                    Token::Eq
                 } else {
-                    Token::ASSIGN
+                    Token::Assign
                 }
             }
-            ';' => Token::SEMICOLON,
-            '(' => Token::LPAREN,
-            ')' => Token::RPAREN,
-            '{' => Token::LBRACE,
-            '}' => Token::RBRACE,
-            ',' => Token::COMMA,
-            '+' => Token::PLUS,
-            '-' => Token::MINUS,
+            ';' => Token::SemiColon,
+            '(' => Token::LParen,
+            ')' => Token::RParen,
+            '{' => Token::LBrace,
+            '}' => Token::RBrace,
+            ',' => Token::Comma,
+            '+' => Token::Plus,
+            '-' => Token::Minus,
             '!' => {
                 if self.peek_char() == '=' {
                     self.read_char();
-                    Token::NOT_EQ
+                    Token::NotEq
                 } else {
-                    Token::BANG
+                    Token::Bang
                 }
             }
-            '*' => Token::ASTERISK,
-            '/' => Token::SLASH,
-            '<' => Token::LT,
-            '>' => Token::GT,
-            '\u{0}' => Token::EOF,
+            '*' => Token::Asterisk,
+            '/' => Token::Slash,
+            '<' => Token::Lt,
+            '>' => Token::Gt,
+            '\u{0}' => Token::Eof,
             _ => {
                 if is_letter(self.ch) {
                     let i = self.read_identifier();
                     return match lookup_indentifier(i.as_str()) {
                         Some(a) => a.to_owned(),
-                        _ => Token::IDENT(i),
+                        _ => Token::Ident(i),
                     };
                 } else if self.ch.is_numeric() {
                     let i = self.read_number();
-                    return Token::INT(i);
+                    return Token::Int(i);
                 } else {
-                    Token::ILLEGAL
+                    Token::Illegal
                 }
             }
         };

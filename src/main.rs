@@ -1,12 +1,17 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
+pub mod ast;
 pub mod lexer;
+pub mod parser;
 pub mod repl;
 pub mod token;
 
 #[cfg(test)]
 pub mod lexer_test;
+
+#[cfg(test)]
+pub mod parser_test;
 
 use std::env;
 
