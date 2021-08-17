@@ -4,13 +4,17 @@ use super::parser::Parser;
 
 #[test]
 pub fn test_let_statement() {
-    let input = "let x = 5;
-                let y = 10;
-                let foobar = 4345678";
+    let input = r#"
+                    let x  5;
+                    let  = 5;
+                    let   5;
+                "#;
     let l = Lexer::new(input.to_string());
-    let p = Parser::new(l);
+    let mut p = Parser::new(l);
 
     let program = p.parse_program();
+    check_parse_errors(p);
+
     assert_eq!(
         vec![
             Statement::LetExpression(
@@ -19,13 +23,23 @@ pub fn test_let_statement() {
             ),
             Statement::LetExpression(
                 Ident(String::from("y")),
-                Expression::Literal(Literal::Int(10))
+                Expression::Literal(Literal::Int(5))
             ),
             Statement::LetExpression(
                 Ident(String::from("foobar")),
-                Expression::Literal(Literal::Int(4345678)),
+                Expression::Literal(Literal::Int(5)),
             ),
         ],
-        program,
+        program.statements,
     );
+}
+
+fn check_parse_errors(p: Parser) {
+    let errors = p.errors;
+
+    if errors.len() == 0 {
+        return;
+    }
+
+    panic!("Parser has {} errors!\n{:?}\n", errors.len(), errors);
 }

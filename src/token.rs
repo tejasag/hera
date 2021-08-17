@@ -6,7 +6,8 @@ pub enum Token {
     Eof,
 
     Ident(String),
-    Int(String),
+    Int(i32),
+    Str(String),
 
     Assign,
     Plus,
@@ -36,14 +37,6 @@ pub enum Token {
     Else,
     Return,
 }
-
-/*
-#[derive(Debug, PartialEq, Clone)]
-pub struct Token<'a> {
-    pub token_type: TokenType,
-    pub literal: &'a str,
-}
-*/
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {

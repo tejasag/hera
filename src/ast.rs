@@ -1,3 +1,5 @@
+use std::fmt::{self, Formatter};
+
 #[derive(PartialEq, Clone, Debug)]
 pub struct Ident(pub String);
 
@@ -21,4 +23,10 @@ pub enum Statement {
 #[derive(PartialEq, Clone, Debug)]
 pub struct Program {
     pub statements: Vec<Statement>,
+}
+
+impl fmt::Display for Expression {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }

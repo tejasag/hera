@@ -107,12 +107,12 @@ impl Lexer {
         self.input[pos..self.position].to_owned()
     }
 
-    pub fn read_number(&mut self) -> String {
+    pub fn read_number(&mut self) -> i32 {
         let pos = self.position;
         while self.ch.is_numeric() {
             self.read_char();
         }
-        self.input[pos..self.position].to_owned()
+        self.input[pos..self.position].parse::<i32>().unwrap()
     }
 
     pub fn skip_whitespace(&mut self) {
