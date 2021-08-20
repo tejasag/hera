@@ -26,6 +26,10 @@ pub struct Lexer {
     pub ch: char,
 }
 
+pub fn idk(i: String) -> Option<String> {
+    return None;
+}
+
 impl Lexer {
     pub fn new(input: String) -> Lexer {
         Lexer {

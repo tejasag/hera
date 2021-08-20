@@ -17,7 +17,9 @@ pub enum Expression {
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum Statement {
-    LetExpression(Ident, Expression),
+    Let(Ident, Expression),
+    Return(Expression),
+    Expression(Expression),
 }
 
 #[derive(PartialEq, Clone, Debug)]

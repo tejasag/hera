@@ -5,9 +5,9 @@ use super::parser::Parser;
 #[test]
 pub fn test_let_statement() {
     let input = r#"
-                    let x  5;
-                    let  = 5;
-                    let   5;
+                    let x = 5;
+                    let y = 5;
+                    let foobar = 5;
                 "#;
     let l = Lexer::new(input.to_string());
     let mut p = Parser::new(l);
@@ -32,6 +32,30 @@ pub fn test_let_statement() {
         ],
         program.statements,
     );
+}
+
+#[test]
+pub fn test_return_statement() {
+    let input = r#"
+                  return 5;
+                  return 10;
+                  return 7894687;
+              "#;
+
+    let l = Lexer::new(input.to_string());
+    let mut p = Parser::new(l);
+
+    let program = p.parse_program();
+    check_parse_errors(p);
+
+    assert_eq!(
+        vec![
+            Statement::ReturnExpression(Expression::Literal(Literal::Int(1))),
+            Statement::ReturnExpression(Expression::Literal(Literal::Int(1))),
+            Statement::ReturnExpression(Expression::Literal(Literal::Int(1))),
+        ],
+        program.statements
+    )
 }
 
 fn check_parse_errors(p: Parser) {

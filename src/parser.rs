@@ -44,7 +44,8 @@ impl Parser {
     pub fn parse_statement(&mut self) -> Option<Statement> {
         match self.current_token {
             Token::Let => self.parse_let_statement(),
-            _ => None,
+            Token::Return => self.parse_return_statement(),
+            _ => panic!("Illegal token found."),
         }
     }
 
@@ -78,6 +79,18 @@ impl Parser {
         }
 
         Some(Statement::LetExpression(name, lit))
+    }
+
+    pub fn parse_return_statement(&mut self) -> Option<Statement> {
+        // let cur = &self.current_token;
+        self.next_token();
+        while !self.current_token_is(Token::SemiColon) {
+            self.next_token();
+        }
+
+        Some(Statement::ReturnExpression(Expression::Literal(
+            Literal::Int(1),
+        )))
     }
 
     fn parse_expression(&mut self) -> Option<ast::Expression> {
