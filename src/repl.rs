@@ -3,10 +3,8 @@ use std::io::{stdin, stdout, Write};
 
 pub fn start() {
     loop {
-        print!(">> ");
-
+        print!(">>> ");
         let _ = stdout().flush();
-
         let mut input_string = String::new();
         stdin().read_line(&mut input_string).ok();
 

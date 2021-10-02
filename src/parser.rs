@@ -1,8 +1,4 @@
-use super::{
-    ast::{self, Expression, Ident, Literal, Program, Statement},
-    lexer::Lexer,
-    token::Token,
-};
+use super::{ast::*, lexer::Lexer, token::Token};
 
 pub struct Parser {
     pub l: Lexer,
@@ -13,7 +9,7 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(lexer: Lexer) -> Self {
-        let mut p = Parser {
+        let mut p: Parser = Parser {
             l: lexer,
             current_token: Token::Eof,
             peek_token: Token::Eof,
@@ -32,7 +28,7 @@ impl Parser {
     pub fn parse_program(&mut self) -> Program {
         let mut statements: Vec<Statement> = vec![];
         while self.current_token != Token::Eof {
-            let stmt = self.parse_statement();
+            let stmt: Option<Statement> = self.parse_statement();
             if stmt != None {
                 statements.push(stmt.unwrap());
             };
@@ -45,7 +41,20 @@ impl Parser {
         match self.current_token {
             Token::Let => self.parse_let_statement(),
             Token::Return => self.parse_return_statement(),
-            _ => panic!("Illegal token found."),
+            // _ => panic!("Illegal token found."),
+            _ => self.parse_expression_statement(),
+        }
+    }
+
+    pub fn parse_expression_statement(&mut self) -> Option<Statement> {
+        match self.parse_expression(Precedence::Lowest) {
+            Some(expression) => {
+                if self.peek_token_is(&Token::SemiColon) {
+                    self.next_token();
+                }
+                Some(Statement::Expression(expression))
+            }
+            None => None,
         }
     }
 
@@ -58,8 +67,8 @@ impl Parser {
             }
         }
 
-        let name = match self.parse_ident() {
-            Some(s) => s,
+        let name: Ident = match self.parse_ident() {
+            Some(Expression::Ident(ref mut s)) => s.clone(),
             _ => return None,
         };
 
@@ -69,7 +78,7 @@ impl Parser {
 
         self.next_token();
 
-        let lit = match self.parse_expression() {
+        let lit: Expression = match self.parse_expression(Precedence::Lowest) {
             Some(e) => e,
             None => return None,
         };
@@ -78,7 +87,7 @@ impl Parser {
             self.next_token();
         }
 
-        Some(Statement::LetExpression(name, lit))
+        Some(Statement::Let(name, lit))
     }
 
     pub fn parse_return_statement(&mut self) -> Option<Statement> {
@@ -88,29 +97,59 @@ impl Parser {
             self.next_token();
         }
 
-        Some(Statement::ReturnExpression(Expression::Literal(
-            Literal::Int(1),
-        )))
+        Some(Statement::Return(Expression::Literal(Literal::Int(1))))
     }
 
-    fn parse_expression(&mut self) -> Option<ast::Expression> {
-        match self.current_token {
+    fn parse_expression(&mut self, _precedence: Precedence) -> Option<Expression> {
+        // prefix
+        let left: Option<Expression> = match self.current_token {
+            Token::Ident(_) => self.parse_ident(),
+            Token::Int(_) => self.parse_int_literal(),
+            Token::Bang | Token::Minus | Token::Plus => self.parse_prefix_expression(),
+            Token::LParen => None,
+            Token::If => None,
+            _ => {
+                // TODO: add function call here
+                None
+            }
+        };
+
+        left
+
+        // infix
+        /*match self.current_token {
             Token::Int(_) => self.parse_int_token(),
             _ => None,
         }
+        */
     }
 
-    fn parse_int_token(&mut self) -> Option<Expression> {
+    fn parse_int_literal(&mut self) -> Option<Expression> {
         match self.current_token {
             Token::Int(ref mut int) => Some(Expression::Literal(Literal::Int(*int))),
             _ => None,
         }
     }
 
-    fn parse_ident(&mut self) -> Option<Ident> {
+    fn parse_ident(&mut self) -> Option<Expression> {
         match self.current_token {
-            Token::Ident(ref mut ident) => Some(Ident(ident.clone())),
+            Token::Ident(ref mut ident) => Some(Expression::Ident(Ident(ident.clone()))),
             _ => None,
+        }
+    }
+
+    fn parse_prefix_expression(&mut self) -> Option<Expression> {
+        let prefix = match self.current_token {
+            Token::Bang => Prefix::Not,
+            Token::Minus => Prefix::Minus,
+            Token::Plus => Prefix::Plus,
+            _ => return None,
+        };
+
+        self.next_token();
+        match self.parse_expression(Precedence::Prefix) {
+            Some(expr) => Some(Expression::Prefix(prefix, Box::new(expr))),
+            None => None,
         }
     }
 
@@ -145,4 +184,14 @@ impl Parser {
         );
         self.errors.push(msg);
     }
+
+    /*
+    fn parse_prefix(&mut self) -> Option<Expression> {
+        None
+    }
+
+    fn parse_infix(&mut self, expr: ast::Expression) -> Option<Expression> {
+        None
+    }
+    */
 }

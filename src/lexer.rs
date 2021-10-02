@@ -26,10 +26,6 @@ pub struct Lexer {
     pub ch: char,
 }
 
-pub fn idk(i: String) -> Option<String> {
-    return None;
-}
-
 impl Lexer {
     pub fn new(input: String) -> Lexer {
         Lexer {
@@ -40,7 +36,7 @@ impl Lexer {
         }
     }
 
-    pub fn read_char(&mut self) {
+    fn read_char(&mut self) {
         if self.read_position >= self.input.len() {
             self.ch = 0 as char;
         } else {
@@ -85,13 +81,13 @@ impl Lexer {
             '\u{0}' => Token::Eof,
             _ => {
                 if is_letter(self.ch) {
-                    let i = self.read_identifier();
+                    let i: String = self.read_identifier();
                     return match lookup_indentifier(i.as_str()) {
                         Some(a) => a.to_owned(),
                         _ => Token::Ident(i),
                     };
                 } else if self.ch.is_numeric() {
-                    let i = self.read_number();
+                    let i: i32 = self.read_number();
                     return Token::Int(i);
                 } else {
                     Token::Illegal
@@ -103,29 +99,29 @@ impl Lexer {
         tok
     }
 
-    pub fn read_identifier(&mut self) -> String {
-        let pos = self.position;
+    fn read_identifier(&mut self) -> String {
+        let pos: usize = self.position;
         while is_letter(self.ch) {
             self.read_char()
         }
         self.input[pos..self.position].to_owned()
     }
 
-    pub fn read_number(&mut self) -> i32 {
-        let pos = self.position;
+    fn read_number(&mut self) -> i32 {
+        let pos: usize = self.position;
         while self.ch.is_numeric() {
             self.read_char();
         }
         self.input[pos..self.position].parse::<i32>().unwrap()
     }
 
-    pub fn skip_whitespace(&mut self) {
+    fn skip_whitespace(&mut self) {
         while self.ch == ' ' || self.ch == '\t' || self.ch == '\n' || self.ch == '\r' {
             self.read_char()
         }
     }
 
-    pub fn peek_char(&self) -> char {
+    fn peek_char(&self) -> char {
         if self.read_position >= self.input.len() {
             0 as char
         } else {

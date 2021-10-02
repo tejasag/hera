@@ -20,6 +20,7 @@ fn main() {
         Ok(i) => i,
         Err(_e) => "there".to_string(),
     };
+
     println!(
         "Hey {}! This is the Hera programming language. Type in a command to run!",
         user
