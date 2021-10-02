@@ -173,10 +173,14 @@ impl Parser {
         };
 
         self.next_token();
-        match self.parse_expression(Precedence::Prefix) {
+
+        self.parse_expression(Precedence::Prefix)
+            .map(|expr| Expression::Prefix(prefix, Box::new(expr)))
+        /* match self.parse_expression(Precedence::Prefix) {
             Some(expr) => Some(Expression::Prefix(prefix, Box::new(expr))),
             None => None,
         }
+        */
     }
 
     fn parse_infix_expression(&mut self, left: Expression) -> Option<Expression> {
@@ -197,10 +201,13 @@ impl Parser {
         let precedence = self.current_token_precedence();
         self.next_token();
 
+        self.parse_expression(precedence)
+            .map(|e| Expression::Infix(infix, Box::new(left), Box::new(e)))
+        /*
         match self.parse_expression(precedence) {
             Some(e) => Some(Expression::Infix(infix, Box::new(left), Box::new(e))),
             None => None,
-        }
+        }*/
     }
 
     fn peek_token_is(&self, t: &Token) -> bool {

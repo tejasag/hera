@@ -190,6 +190,5 @@ pub fn test_infix_expression() {
     let program = parser.parse_program();
 
     check_parse_errors(parser);
-    println!("{:#?}", program.statements);
     assert_eq!(tests, program.statements);
 }
