@@ -101,6 +101,27 @@ pub fn test_int_literal_expression() {
 }
 
 #[test]
+pub fn test_bool_literal_expression() {
+    let input = r#"
+            true
+            false
+        "#;
+
+    let l = Lexer::new(input.to_string());
+    let mut p = Parser::new(l);
+
+    let program = p.parse_program();
+    check_parse_errors(p);
+    assert_eq!(
+        vec![
+            Statement::Expression(Expression::Literal(Literal::Bool(true))),
+            Statement::Expression(Expression::Literal(Literal::Bool(false)))
+        ],
+        program.statements
+    );
+}
+
+#[test]
 pub fn test_prefix_expression() {
     let tests: Vec<Statement> = vec![
         Statement::Expression(Expression::Prefix(

@@ -8,6 +8,7 @@ pub enum Token {
     Ident(String),
     Int(i32),
     Str(String),
+    Bool(bool),
 
     Assign,
     Plus,
@@ -33,8 +34,6 @@ pub enum Token {
 
     Function,
     Let,
-    True,
-    False,
     If,
     Else,
     Return,

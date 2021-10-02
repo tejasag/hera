@@ -55,6 +55,7 @@ impl fmt::Display for Infix {
 pub enum Literal {
     String(String),
     Int(i32),
+    Bool(bool),
 }
 
 #[derive(PartialEq, Clone, Debug)]

@@ -6,8 +6,8 @@ lazy_static::lazy_static! {
         let mut keywords = HashMap::new();
         keywords.insert("fn", Token::Function);
         keywords.insert("let", Token::Let);
-        keywords.insert("true", Token::True);
-        keywords.insert("false", Token::False);
+        keywords.insert("true", Token::Bool(true));
+        keywords.insert("false", Token::Bool(false));
         keywords.insert("if", Token::If);
         keywords.insert("else", Token::Else);
         keywords.insert("return", Token::Return);
