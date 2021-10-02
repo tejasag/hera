@@ -129,3 +129,67 @@ pub fn test_prefix_expression() {
     check_parse_errors(parser);
     assert_eq!(tests, program.statements);
 }
+
+#[test]
+pub fn test_infix_expression() {
+    let tests: Vec<Statement> = vec![
+        Statement::Expression(Expression::Infix(
+            Infix::Plus,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+        Statement::Expression(Expression::Infix(
+            Infix::Minus,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+        Statement::Expression(Expression::Infix(
+            Infix::Multiply,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+        Statement::Expression(Expression::Infix(
+            Infix::Divide,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+        Statement::Expression(Expression::Infix(
+            Infix::LessThan,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+        Statement::Expression(Expression::Infix(
+            Infix::GreaterThan,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+        Statement::Expression(Expression::Infix(
+            Infix::Equal,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+        Statement::Expression(Expression::Infix(
+            Infix::NotEqual,
+            Box::new(Expression::Literal(Literal::Int(5))),
+            Box::new(Expression::Literal(Literal::Int(5))),
+        )),
+    ];
+
+    let input = r#"
+        5+5;
+        5-5;
+        5*5;
+        5/5;
+        5<5;
+        5>5;
+        5==5;
+        5!=5;
+    "#;
+
+    let mut parser = Parser::new(Lexer::new(input.to_string()));
+    let program = parser.parse_program();
+
+    check_parse_errors(parser);
+    println!("{:#?}", program.statements);
+    assert_eq!(tests, program.statements);
+}

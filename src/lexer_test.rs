@@ -84,7 +84,7 @@ let result = add(five, ten);
         SemiColon,
         RBrace,
         Int(10),
-        Eq,
+        Equal,
         Int(10),
         SemiColon,
         Int(9),

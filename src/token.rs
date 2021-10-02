@@ -18,7 +18,9 @@ pub enum Token {
 
     Lt,
     Gt,
-    Eq,
+    LtEq,
+    GtEq,
+    Equal,
     NotEq,
 
     Comma,

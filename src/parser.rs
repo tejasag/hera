@@ -25,6 +25,19 @@ impl Parser {
         self.peek_token = self.l.next_token();
     }
 
+    fn token_to_precedence(tok: &Token) -> Precedence {
+        match tok {
+            Token::Equal | Token::NotEq => Precedence::Equals,
+            Token::Lt | Token::LtEq => Precedence::LessGreater,
+            Token::Gt | Token::GtEq => Precedence::LessGreater,
+            Token::Plus | Token::Minus => Precedence::Sum,
+            Token::Slash | Token::Asterisk => Precedence::Product,
+            Token::LBrace => Precedence::Index,
+            Token::LParen => Precedence::Call,
+            _ => Precedence::Lowest,
+        }
+    }
+
     pub fn parse_program(&mut self) -> Program {
         let mut statements: Vec<Statement> = vec![];
         while self.current_token != Token::Eof {
@@ -100,9 +113,9 @@ impl Parser {
         Some(Statement::Return(Expression::Literal(Literal::Int(1))))
     }
 
-    fn parse_expression(&mut self, _precedence: Precedence) -> Option<Expression> {
+    fn parse_expression(&mut self, precedence: Precedence) -> Option<Expression> {
         // prefix
-        let left: Option<Expression> = match self.current_token {
+        let mut left: Option<Expression> = match self.current_token {
             Token::Ident(_) => self.parse_ident(),
             Token::Int(_) => self.parse_int_literal(),
             Token::Bang | Token::Minus | Token::Plus => self.parse_prefix_expression(),
@@ -114,14 +127,27 @@ impl Parser {
             }
         };
 
-        left
-
         // infix
-        /*match self.current_token {
-            Token::Int(_) => self.parse_int_token(),
-            _ => None,
+        while !self.peek_token_is(&Token::SemiColon) && precedence < self.next_token_precedence() {
+            match self.peek_token {
+                Token::Plus
+                | Token::Minus
+                | Token::Asterisk
+                | Token::Equal
+                | Token::Slash
+                | Token::NotEq
+                | Token::Lt
+                | Token::LtEq
+                | Token::Gt
+                | Token::GtEq => {
+                    self.next_token();
+                    left = self.parse_infix_expression(left.unwrap());
+                }
+                _ => return left,
+            }
         }
-        */
+
+        left
     }
 
     fn parse_int_literal(&mut self) -> Option<Expression> {
@@ -149,6 +175,30 @@ impl Parser {
         self.next_token();
         match self.parse_expression(Precedence::Prefix) {
             Some(expr) => Some(Expression::Prefix(prefix, Box::new(expr))),
+            None => None,
+        }
+    }
+
+    fn parse_infix_expression(&mut self, left: Expression) -> Option<Expression> {
+        let infix = match self.current_token {
+            Token::Plus => Infix::Plus,
+            Token::Minus => Infix::Minus,
+            Token::Slash => Infix::Divide,
+            Token::Asterisk => Infix::Multiply,
+            Token::Equal => Infix::Equal,
+            Token::NotEq => Infix::NotEqual,
+            Token::Lt => Infix::LessThan,
+            Token::Gt => Infix::GreaterThan,
+            Token::LtEq => Infix::LessThanEqual,
+            Token::GtEq => Infix::GreaterThanEqual,
+            _ => return None,
+        };
+
+        let precedence = self.current_token_precedence();
+        self.next_token();
+
+        match self.parse_expression(precedence) {
+            Some(e) => Some(Expression::Infix(infix, Box::new(left), Box::new(e))),
             None => None,
         }
     }
@@ -185,13 +235,11 @@ impl Parser {
         self.errors.push(msg);
     }
 
-    /*
-    fn parse_prefix(&mut self) -> Option<Expression> {
-        None
+    fn current_token_precedence(&mut self) -> Precedence {
+        Self::token_to_precedence(&self.current_token)
     }
 
-    fn parse_infix(&mut self, expr: ast::Expression) -> Option<Expression> {
-        None
+    fn next_token_precedence(&mut self) -> Precedence {
+        Self::token_to_precedence(&self.peek_token)
     }
-    */
 }

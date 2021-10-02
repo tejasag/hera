@@ -62,7 +62,7 @@ pub enum Expression {
     Ident(Ident),
     Literal(Literal),
     Prefix(Prefix, Box<Expression>),
-    Infix(Prefix, Box<Expression>),
+    Infix(Infix, Box<Expression>, Box<Expression>),
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -83,7 +83,7 @@ impl fmt::Display for Expression {
     }
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, PartialOrd, Debug, Clone)]
 pub enum Precedence {
     Lowest,
     Equals,
@@ -92,4 +92,5 @@ pub enum Precedence {
     Product,
     Prefix,
     Call,
+    Index,
 }

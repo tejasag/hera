@@ -53,7 +53,7 @@ impl Lexer {
             '=' => {
                 if self.peek_char() == '=' {
                     self.read_char();
-                    Token::Eq
+                    Token::Equal
                 } else {
                     Token::Assign
                 }
