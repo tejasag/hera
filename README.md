@@ -1,2 +1,3 @@
 # `hera`
-Hera is a simple [monkey-lang](https://monkey-lang.org) written in Rust
+
+Hera is a simple programming language made to learn more about interpreters and compilers.

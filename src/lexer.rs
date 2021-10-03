@@ -76,8 +76,22 @@ impl Lexer {
             }
             '*' => Token::Asterisk,
             '/' => Token::Slash,
-            '<' => Token::Lt,
-            '>' => Token::Gt,
+            '<' => {
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    Token::LtEq
+                } else {
+                    Token::Lt
+                }
+            }
+            '>' => {
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    Token::GtEq
+                } else {
+                    Token::Gt
+                }
+            }
             '\u{0}' => Token::Eof,
             _ => {
                 if is_letter(self.ch) {
