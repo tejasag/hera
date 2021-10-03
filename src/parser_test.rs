@@ -383,7 +383,34 @@ fn test_operator_precedence_parsing() {
                 )),
             )),
         ),
-        // ("3 + 4 * 5 == 3 * 1 + 4 * 5"),
+        (
+            "3 + 4 * 5 == 3 * 1 + 4 * 5",
+            Statement::Expression(Expression::Infix(
+                Infix::Equal,
+                Box::new(Expression::Infix(
+                    Infix::Plus,
+                    Box::new(Expression::Literal(Literal::Int(3))),
+                    Box::new(Expression::Infix(
+                        Infix::Multiply,
+                        Box::new(Expression::Literal(Literal::Int(4))),
+                        Box::new(Expression::Literal(Literal::Int(5))),
+                    )),
+                )),
+                Box::new(Expression::Infix(
+                    Infix::Plus,
+                    Box::new(Expression::Infix(
+                        Infix::Multiply,
+                        Box::new(Expression::Literal(Literal::Int(3))),
+                        Box::new(Expression::Literal(Literal::Int(1))),
+                    )),
+                    Box::new(Expression::Infix(
+                        Infix::Multiply,
+                        Box::new(Expression::Literal(Literal::Int(4))),
+                        Box::new(Expression::Literal(Literal::Int(5))),
+                    )),
+                )),
+            )),
+        ),
         // ("true"),
         // ("false"),
         // ("3 > 5 == false"),
