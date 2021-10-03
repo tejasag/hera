@@ -411,10 +411,38 @@ fn test_operator_precedence_parsing() {
                 )),
             )),
         ),
-        // ("true"),
-        // ("false"),
-        // ("3 > 5 == false"),
-        // ("3 < 5 == true"),
+        (
+            "true",
+            Statement::Expression(Expression::Literal(Literal::Bool(true))),
+        ),
+        (
+            "false",
+            Statement::Expression(Expression::Literal(Literal::Bool(false))),
+        ),
+        (
+            "3 > 5 == false",
+            Statement::Expression(Expression::Infix(
+                Infix::Equal,
+                Box::new(Expression::Infix(
+                    Infix::GreaterThan,
+                    Box::new(Expression::Literal(Literal::Int(3))),
+                    Box::new(Expression::Literal(Literal::Int(5))),
+                )),
+                Box::new(Expression::Literal(Literal::Bool(false))),
+            )),
+        ),
+        (
+            "3 < 5 == true",
+            Statement::Expression(Expression::Infix(
+                Infix::Equal,
+                Box::new(Expression::Infix(
+                    Infix::LessThan,
+                    Box::new(Expression::Literal(Literal::Int(3))),
+                    Box::new(Expression::Literal(Literal::Int(5))),
+                )),
+                Box::new(Expression::Literal(Literal::Bool(true))),
+            )),
+        ),
     ];
 
     for (input, expect) in tests {
