@@ -15,7 +15,7 @@ lazy_static::lazy_static! {
     };
 }
 
-pub fn lookup_indentifier(i: &str) -> Option<&'static Token> {
+pub fn lookup_indentifier(i: &str) -> Option<&Token> {
     KEYWORDS.get(i)
 }
 
@@ -37,11 +37,11 @@ impl Lexer {
     }
 
     fn read_char(&mut self) {
-        if self.read_position >= self.input.len() {
-            self.ch = 0 as char;
+        self.ch = if self.read_position >= self.input.len() {
+            0 as char
         } else {
-            self.ch = self.input.chars().nth(self.read_position).unwrap();
-        }
+            self.input.chars().nth(self.read_position).unwrap()
+        };
         self.position = self.read_position;
         self.read_position += 1;
     }
@@ -118,7 +118,7 @@ impl Lexer {
         while is_letter(self.ch) {
             self.read_char()
         }
-        self.input[pos..self.position].to_owned()
+        self.input[pos..self.position].to_string()
     }
 
     fn read_number(&mut self) -> i32 {
@@ -137,10 +137,9 @@ impl Lexer {
 
     fn peek_char(&self) -> char {
         if self.read_position >= self.input.len() {
-            0 as char
-        } else {
-            self.input.chars().nth(self.read_position).unwrap()
+            return 0 as char;
         }
+        self.input.chars().nth(self.read_position).unwrap()
     }
 }
 

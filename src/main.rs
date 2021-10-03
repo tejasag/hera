@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+#![feature(format_args_capture)]
 
 pub mod ast;
 pub mod lexer;
@@ -21,9 +22,6 @@ fn main() {
         Err(_e) => "there".to_string(),
     };
 
-    println!(
-        "Hey {}! This is the Hera programming language. Type in a command to run!",
-        user
-    );
+    println!("Hey {user}! This is the Hera programming language. Type in a command to run!");
     repl::start();
 }
