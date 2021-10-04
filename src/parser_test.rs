@@ -468,20 +468,44 @@ fn test_operator_precedence_parsing() {
 
 #[test]
 pub fn test_if_expression() {
-    let tests: Vec<(&str, Statement)> = vec![(
-        "if ( x > y ) { x }",
-        Statement::Expression(Expression::If {
-            condition: Box::new(Expression::Infix(
-                Infix::GreaterThan,
-                Box::new(Expression::Ident(Ident(String::from("x")))),
-                Box::new(Expression::Ident(Ident(String::from("y")))),
-            )),
-            consequence: vec![Statement::Expression(Expression::Ident(Ident(
-                String::from("x"),
-            )))],
-            alternative: None,
-        }),
-    )];
+    let tests: Vec<(&str, Statement)> = vec![
+        (
+            "if ( x > y ) { x }",
+            Statement::Expression(Expression::If {
+                condition: Box::new(Expression::Infix(
+                    Infix::GreaterThan,
+                    Box::new(Expression::Ident(Ident(String::from("x")))),
+                    Box::new(Expression::Ident(Ident(String::from("y")))),
+                )),
+                consequence: vec![Statement::Expression(Expression::Ident(Ident(
+                    String::from("x"),
+                )))],
+                alternative: None,
+            }),
+        ),
+        (
+            "if ((5 * 5) + 5 >= 30) { true }",
+            Statement::Expression(Expression::If {
+                condition: Box::new(Expression::Infix(
+                    Infix::GreaterThanEqual,
+                    Box::new(Expression::Infix(
+                        Infix::Plus,
+                        Box::new(Expression::Infix(
+                            Infix::Multiply,
+                            Box::new(Expression::Literal(Literal::Int(5))),
+                            Box::new(Expression::Literal(Literal::Int(5))),
+                        )),
+                        Box::new(Expression::Literal(Literal::Int(5))),
+                    )),
+                    Box::new(Expression::Literal(Literal::Int(30))),
+                )),
+                consequence: vec![Statement::Expression(Expression::Literal(Literal::Bool(
+                    true,
+                )))],
+                alternative: None,
+            }),
+        ),
+    ];
 
     for (input, expect) in tests {
         let mut parser = Parser::new(Lexer::new(input.to_string()));
