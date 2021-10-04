@@ -64,6 +64,11 @@ pub enum Expression {
     Literal(Literal),
     Prefix(Prefix, Box<Expression>),
     Infix(Infix, Box<Expression>, Box<Expression>),
+    If {
+        condition: Box<Expression>,
+        consequence: BlockStatement,
+        alternative: Option<BlockStatement>,
+    },
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -95,3 +100,5 @@ pub enum Precedence {
     Call,
     Index,
 }
+
+pub type BlockStatement = Vec<Statement>;

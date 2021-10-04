@@ -104,13 +104,32 @@ impl Parser {
     }
 
     pub fn parse_return_statement(&mut self) -> Option<Statement> {
-        // let cur = &self.current_token;
         self.next_token();
+
+        let exp = match self.parse_expression(Precedence::Lowest) {
+            Some(e) => e,
+            None => return None,
+        };
+
         while !self.current_token_is(Token::SemiColon) {
             self.next_token();
         }
 
-        Some(Statement::Return(Expression::Literal(Literal::Int(1))))
+        Some(Statement::Return(exp))
+    }
+
+    fn parse_block_statement(&mut self) -> BlockStatement {
+        self.next_token();
+
+        let mut statements = vec![];
+        while !self.current_token_is(Token::RBrace) && !self.current_token_is(Token::Eof) {
+            if let Some(s) = self.parse_statement() {
+                statements.push(s);
+            }
+            self.next_token();
+        }
+
+        statements
     }
 
     fn parse_expression(&mut self, precedence: Precedence) -> Option<Expression> {
@@ -121,7 +140,7 @@ impl Parser {
             Token::Bool(_) => self.parse_bool_literal(),
             Token::Bang | Token::Minus | Token::Plus => self.parse_prefix_expression(),
             Token::LParen => self.parse_grouped_expression(),
-            Token::If => None,
+            Token::If => self.parse_if_expression(),
             _ => {
                 // TODO: add function call here
                 None
@@ -215,6 +234,40 @@ impl Parser {
             return None;
         }
         exp
+    }
+
+    fn parse_if_expression(&mut self) -> Option<Expression> {
+        if !self.expect_peek(Token::LParen) {
+            return None;
+        }
+
+        self.next_token();
+
+        let expr: Expression = match self.parse_expression(Precedence::Lowest) {
+            Some(e) => e,
+            None => return None,
+        };
+
+        if !self.expect_peek(Token::RParen) || !self.expect_peek(Token::LBrace) {
+            return None;
+        }
+
+        let cons: Vec<Statement> = self.parse_block_statement();
+        let mut alternative: Option<Vec<Statement>> = None;
+        if self.peek_token_is(&Token::Else) {
+            self.next_token();
+
+            if !self.expect_peek(Token::LBrace) {
+                return None;
+            }
+            alternative = Some(self.parse_block_statement());
+        }
+
+        Some(Expression::If {
+            condition: Box::new(expr),
+            consequence: cons,
+            alternative,
+        })
     }
 
     fn peek_token_is(&self, t: &Token) -> bool {

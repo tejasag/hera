@@ -60,9 +60,9 @@ pub fn test_return_statement() {
 
     assert_eq!(
         vec![
-            Statement::Return(Expression::Literal(Literal::Int(1))),
-            Statement::Return(Expression::Literal(Literal::Int(1))),
-            Statement::Return(Expression::Literal(Literal::Int(1))),
+            Statement::Return(Expression::Literal(Literal::Int(5))),
+            Statement::Return(Expression::Literal(Literal::Int(10))),
+            Statement::Return(Expression::Literal(Literal::Int(7894687))),
         ],
         program.statements
     )
@@ -456,6 +456,32 @@ fn test_operator_precedence_parsing() {
             )),
         ),
     ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+
+        check_parse_errors(parser);
+        assert_eq!(vec![expect], program.statements);
+    }
+}
+
+#[test]
+pub fn test_if_expression() {
+    let tests: Vec<(&str, Statement)> = vec![(
+        "if ( x > y ) { x }",
+        Statement::Expression(Expression::If {
+            condition: Box::new(Expression::Infix(
+                Infix::GreaterThan,
+                Box::new(Expression::Ident(Ident(String::from("x")))),
+                Box::new(Expression::Ident(Ident(String::from("y")))),
+            )),
+            consequence: vec![Statement::Expression(Expression::Ident(Ident(
+                String::from("x"),
+            )))],
+            alternative: None,
+        }),
+    )];
 
     for (input, expect) in tests {
         let mut parser = Parser::new(Lexer::new(input.to_string()));
