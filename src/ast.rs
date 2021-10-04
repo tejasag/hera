@@ -69,6 +69,10 @@ pub enum Expression {
         consequence: BlockStatement,
         alternative: Option<BlockStatement>,
     },
+    Fn {
+        params: Vec<Ident>,
+        body: BlockStatement,
+    },
 }
 
 #[derive(PartialEq, Clone, Debug)]

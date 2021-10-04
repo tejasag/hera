@@ -560,11 +560,10 @@ pub fn test_if_else_expression() {
             }),
         ),
         (
-            r#"
-                if ( x > y ) { x } 
-                else if (y == x) { 1 } 
-                else if (y * 2 > x ) { 2 } 
-                else { y }"#,
+            r#"if ( x > y ) { x } 
+               else if (y == x) { 1 } 
+               else if (y * 2 > x ) { 2 } 
+               else { y }"#,
             Statement::Expression(Expression::If {
                 condition: Box::new(Expression::Infix(
                     Infix::GreaterThan,
@@ -650,4 +649,24 @@ pub fn test_if_else_expression() {
         check_parse_errors(parser);
         assert_eq!(vec![expect], program.statements);
     }
+}
+
+#[test]
+pub fn test_fn_expression() {
+    let input = r#"fn(a,b) { return a+b; }"#;
+    let mut parser = Parser::new(Lexer::new(input.to_string()));
+    let program = parser.parse_program();
+
+    check_parse_errors(parser);
+    assert_eq!(
+        program.statements,
+        vec![Statement::Expression(Expression::Fn {
+            params: vec![Ident(String::from("a")), Ident(String::from("b"))],
+            body: vec![Statement::Return(Expression::Infix(
+                Infix::Plus,
+                Box::new(Expression::Ident(Ident(String::from("a")))),
+                Box::new(Expression::Ident(Ident(String::from("b")))),
+            )),]
+        })]
+    );
 }

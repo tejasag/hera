@@ -141,6 +141,7 @@ impl Parser {
             Token::Bang | Token::Minus | Token::Plus => self.parse_prefix_expression(),
             Token::LParen => self.parse_grouped_expression(),
             Token::If => self.parse_if_expression(),
+            Token::Function => self.parse_fn_expression(),
             _ => {
                 // TODO: add function call here
                 None
@@ -273,6 +274,44 @@ impl Parser {
             consequence: cons,
             alternative,
         })
+    }
+
+    fn parse_fn_expression(&mut self) -> Option<Expression> {
+        if !self.expect_peek(Token::LParen) {
+            return None;
+        }
+        let params = match self.parse_fn_params() {
+            Some(s) => s,
+            None => return None,
+        };
+        let body = self.parse_block_statement();
+
+        Some(Expression::Fn { params, body })
+    }
+
+    fn parse_fn_params(&mut self) -> Option<Vec<Ident>> {
+        let mut idents: Vec<Ident> = vec![];
+        if self.peek_token_is(&Token::RParen) {
+            self.next_token();
+            return Some(idents);
+        }
+
+        self.next_token();
+        match self.current_token {
+            Token::Ident(ref mut ident) => idents.push(Ident(ident.clone())),
+            _ => return None,
+        };
+
+        while self.peek_token_is(&Token::Comma) {
+            self.next_token();
+            self.next_token();
+            match self.current_token {
+                Token::Ident(ref mut ident) => idents.push(Ident(ident.clone())),
+                _ => return None,
+            };
+        }
+
+        Some(idents)
     }
 
     fn peek_token_is(&self, t: &Token) -> bool {
