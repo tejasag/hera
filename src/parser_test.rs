@@ -515,3 +515,73 @@ pub fn test_if_expression() {
         assert_eq!(vec![expect], program.statements);
     }
 }
+
+#[test]
+pub fn test_if_else_expression() {
+    let tests: Vec<(&str, Statement)> = vec![
+        (
+            "if ( x > y ) { x } else { y }",
+            Statement::Expression(Expression::If {
+                condition: Box::new(Expression::Infix(
+                    Infix::GreaterThan,
+                    Box::new(Expression::Ident(Ident(String::from("x")))),
+                    Box::new(Expression::Ident(Ident(String::from("y")))),
+                )),
+                consequence: vec![Statement::Expression(Expression::Ident(Ident(
+                    String::from("x"),
+                )))],
+                alternative: Some(vec![Statement::Expression(Expression::Ident(Ident(
+                    String::from("y"),
+                )))]),
+            }),
+        ),
+        (
+            r#"
+             if ((5 * 5) + 5 >= 30) { 
+                true
+             } else {
+                return 5 + (89 * 64 / 10);
+             }
+            "#,
+            Statement::Expression(Expression::If {
+                condition: Box::new(Expression::Infix(
+                    Infix::GreaterThanEqual,
+                    Box::new(Expression::Infix(
+                        Infix::Plus,
+                        Box::new(Expression::Infix(
+                            Infix::Multiply,
+                            Box::new(Expression::Literal(Literal::Int(5))),
+                            Box::new(Expression::Literal(Literal::Int(5))),
+                        )),
+                        Box::new(Expression::Literal(Literal::Int(5))),
+                    )),
+                    Box::new(Expression::Literal(Literal::Int(30))),
+                )),
+                consequence: vec![Statement::Expression(Expression::Literal(Literal::Bool(
+                    true,
+                )))],
+                alternative: Some(vec![Statement::Return(Expression::Infix(
+                    Infix::Plus,
+                    Box::new(Expression::Literal(Literal::Int(5))),
+                    Box::new(Expression::Infix(
+                        Infix::Divide,
+                        Box::new(Expression::Infix(
+                            Infix::Multiply,
+                            Box::new(Expression::Literal(Literal::Int(89))),
+                            Box::new(Expression::Literal(Literal::Int(64))),
+                        )),
+                        Box::new(Expression::Literal(Literal::Int(10))),
+                    )),
+                ))]),
+            }),
+        ),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+
+        check_parse_errors(parser);
+        assert_eq!(vec![expect], program.statements);
+    }
+}
