@@ -536,6 +536,30 @@ pub fn test_if_else_expression() {
             }),
         ),
         (
+            "if ( x > y ) { x } else if (y == x) { 1 } else { y }",
+            Statement::Expression(Expression::If {
+                condition: Box::new(Expression::Infix(
+                    Infix::GreaterThan,
+                    Box::new(Expression::Ident(Ident(String::from("x")))),
+                    Box::new(Expression::Ident(Ident(String::from("y")))),
+                )),
+                consequence: vec![Statement::Expression(Expression::Ident(Ident(
+                    String::from("x"),
+                )))],
+                alternative: Some(vec![Statement::Expression(Expression::If {
+                    condition: Box::new(Expression::Infix(
+                        Infix::Equal,
+                        Box::new(Expression::Ident(Ident(String::from("y")))),
+                        Box::new(Expression::Ident(Ident(String::from("x")))),
+                    )),
+                    consequence: vec![Statement::Expression(Expression::Literal(Literal::Int(1)))],
+                    alternative: Some(vec![Statement::Expression(Expression::Ident(Ident(
+                        String::from("y"),
+                    )))]),
+                })]),
+            }),
+        ),
+        (
             r#"
              if ((5 * 5) + 5 >= 30) { 
                 true

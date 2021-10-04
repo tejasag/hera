@@ -257,10 +257,15 @@ impl Parser {
         if self.peek_token_is(&Token::Else) {
             self.next_token();
 
-            if !self.expect_peek(Token::LBrace) {
+            if self.peek_token_is(&Token::If) {
+                self.next_token();
+                let else_if = self.parse_if_expression();
+                alternative = Some(vec![Statement::Expression(else_if.unwrap())]);
+            } else if !self.expect_peek(Token::LBrace) {
                 return None;
-            }
-            alternative = Some(self.parse_block_statement());
+            } else {
+                alternative = Some(self.parse_block_statement())
+            };
         }
 
         Some(Expression::If {
