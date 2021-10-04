@@ -443,6 +443,18 @@ fn test_operator_precedence_parsing() {
                 Box::new(Expression::Literal(Literal::Bool(true))),
             )),
         ),
+        (
+            "a + (b + c)",
+            Statement::Expression(Expression::Infix(
+                Infix::Plus,
+                Box::new(Expression::Ident(Ident(String::from("a")))),
+                Box::new(Expression::Infix(
+                    Infix::Plus,
+                    Box::new(Expression::Ident(Ident(String::from("b")))),
+                    Box::new(Expression::Ident(Ident(String::from("c")))),
+                )),
+            )),
+        ),
     ];
 
     for (input, expect) in tests {

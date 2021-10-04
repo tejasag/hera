@@ -120,7 +120,7 @@ impl Parser {
             Token::Int(_) => self.parse_int_literal(),
             Token::Bool(_) => self.parse_bool_literal(),
             Token::Bang | Token::Minus | Token::Plus => self.parse_prefix_expression(),
-            Token::LParen => None,
+            Token::LParen => self.parse_grouped_expression(),
             Token::If => None,
             _ => {
                 // TODO: add function call here
@@ -206,6 +206,15 @@ impl Parser {
 
         self.parse_expression(precedence)
             .map(|e| Expression::Infix(infix, Box::new(left), Box::new(e)))
+    }
+
+    fn parse_grouped_expression(&mut self) -> Option<Expression> {
+        self.next_token();
+        let exp = self.parse_expression(Precedence::Lowest);
+        if !self.expect_peek(Token::RParen) {
+            return None;
+        }
+        exp
     }
 
     fn peek_token_is(&self, t: &Token) -> bool {
