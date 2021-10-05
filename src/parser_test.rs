@@ -691,3 +691,29 @@ pub fn test_fn_expression() {
         ]
     );
 }
+
+#[test]
+pub fn test_call_expression() {
+    let tests: Vec<(&str, Statement)> = vec![(
+        "add(1, 3+4)",
+        Statement::Expression(Expression::Call {
+            function: Box::new(Expression::Ident(Ident(String::from("add")))),
+            args: vec![
+                Expression::Literal(Literal::Int(1)),
+                Expression::Infix(
+                    Infix::Plus,
+                    Box::new(Expression::Literal(Literal::Int(3))),
+                    Box::new(Expression::Literal(Literal::Int(4))),
+                ),
+            ],
+        }),
+    )];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+
+        check_parse_errors(parser);
+        assert_eq!(vec![expect], program.statements);
+    }
+}

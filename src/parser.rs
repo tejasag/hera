@@ -164,6 +164,10 @@ impl Parser {
                     self.next_token();
                     left = self.parse_infix_expression(left.unwrap());
                 }
+                Token::LParen => {
+                    self.next_token();
+                    left = self.parse_call_expression(left.unwrap());
+                }
                 _ => return left,
             }
         }
@@ -312,6 +316,49 @@ impl Parser {
         }
 
         Some(idents)
+    }
+
+    fn parse_call_expression(&mut self, left: Expression) -> Option<Expression> {
+        let args = match self.parse_call_arguments() {
+            Some(e) => e,
+            None => return None,
+        };
+
+        Some(Expression::Call {
+            function: Box::new(left),
+            args,
+        })
+    }
+
+    fn parse_call_arguments(&mut self) -> Option<Vec<Expression>> {
+        let mut args: Vec<Expression> = vec![];
+
+        if self.peek_token_is(&Token::RParen) {
+            self.next_token();
+            return Some(args);
+        }
+
+        self.next_token();
+        match self.parse_expression(Precedence::Lowest) {
+            Some(e) => args.push(e),
+            None => return None,
+        };
+
+        while self.peek_token_is(&Token::Comma) {
+            self.next_token();
+            self.next_token();
+
+            match self.parse_expression(Precedence::Lowest) {
+                Some(e) => args.push(e),
+                None => return None,
+            };
+        }
+
+        if !self.expect_peek(Token::RParen) {
+            return None;
+        }
+
+        Some(args)
     }
 
     fn peek_token_is(&self, t: &Token) -> bool {
