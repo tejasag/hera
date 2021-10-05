@@ -653,20 +653,41 @@ pub fn test_if_else_expression() {
 
 #[test]
 pub fn test_fn_expression() {
-    let input = r#"fn(a,b) { return a+b; }"#;
+    let input = r#"
+        fn() { return true;  };
+        fn(a,b) { return a+b; };
+        let sub = fn (a,b) { a-b };
+    "#;
     let mut parser = Parser::new(Lexer::new(input.to_string()));
     let program = parser.parse_program();
 
     check_parse_errors(parser);
     assert_eq!(
         program.statements,
-        vec![Statement::Expression(Expression::Fn {
-            params: vec![Ident(String::from("a")), Ident(String::from("b"))],
-            body: vec![Statement::Return(Expression::Infix(
-                Infix::Plus,
-                Box::new(Expression::Ident(Ident(String::from("a")))),
-                Box::new(Expression::Ident(Ident(String::from("b")))),
-            )),]
-        })]
+        vec![
+            Statement::Expression(Expression::Fn {
+                params: vec![],
+                body: vec![Statement::Return(Expression::Literal(Literal::Bool(true)))],
+            }),
+            Statement::Expression(Expression::Fn {
+                params: vec![Ident(String::from("a")), Ident(String::from("b"))],
+                body: vec![Statement::Return(Expression::Infix(
+                    Infix::Plus,
+                    Box::new(Expression::Ident(Ident(String::from("a")))),
+                    Box::new(Expression::Ident(Ident(String::from("b")))),
+                )),]
+            }),
+            Statement::Let(
+                Ident(String::from("sub")),
+                Expression::Fn {
+                    params: vec![Ident(String::from("a")), Ident(String::from("b"))],
+                    body: vec![Statement::Expression(Expression::Infix(
+                        Infix::Minus,
+                        Box::new(Expression::Ident(Ident(String::from("a")))),
+                        Box::new(Expression::Ident(Ident(String::from("b")))),
+                    ))]
+                }
+            )
+        ]
     );
 }
