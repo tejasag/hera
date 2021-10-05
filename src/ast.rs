@@ -73,6 +73,10 @@ pub enum Expression {
         params: Vec<Ident>,
         body: BlockStatement,
     },
+    Call {
+        function: Box<Expression>,
+        args: Vec<Expression>,
+    },
 }
 
 #[derive(PartialEq, Clone, Debug)]
