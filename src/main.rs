@@ -21,9 +21,6 @@ fn main() {
         Err(_e) => "there".to_string(),
     };
 
-    println!(
-        "Hey {}! This is the Hera programming language. Type in a command to run!",
-        user
-    );
+    println!("Hey {}! This is the Hera programming language. Type in a command to run!", user);
     repl::start();
 }
