@@ -8,12 +8,6 @@ pub mod parser;
 pub mod repl;
 pub mod token;
 
-#[cfg(test)]
-pub mod lexer_test;
-
-#[cfg(test)]
-pub mod parser_test;
-
 use std::env;
 
 fn main() {

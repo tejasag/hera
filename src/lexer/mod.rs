@@ -1,4 +1,7 @@
-use super::token::Token;
+#[cfg(test)]
+pub mod test;
+
+use crate::token::Token;
 use std::collections::HashMap;
 
 lazy_static::lazy_static! {

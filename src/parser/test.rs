@@ -1,6 +1,4 @@
-use super::ast::*;
-use super::lexer::Lexer;
-use super::parser::Parser;
+use crate::{ast::*, lexer::Lexer, parser::Parser};
 
 fn check_parse_errors(p: Parser) {
     let errors = p.errors;

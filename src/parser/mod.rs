@@ -1,4 +1,7 @@
-use super::{ast::*, lexer::Lexer, token::Token};
+#[cfg(test)]
+pub mod test;
+
+use crate::{ast::*, lexer::Lexer, token::Token};
 
 pub struct Parser {
     pub l: Lexer,

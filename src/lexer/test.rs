@@ -1,4 +1,4 @@
-use super::{
+use crate::{
     lexer::Lexer,
     token::Token::{self, *},
 };
