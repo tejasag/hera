@@ -3,7 +3,7 @@ use std::fmt;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum Object {
-    Int(i64),
+    Int(i32),
     String(String),
     Bool(bool),
     Null,
