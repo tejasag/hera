@@ -17,17 +17,19 @@ impl Eval {
         let mut result = None;
 
         for statement in program.statements {
-            match self.eval_statement(statement) {
+            /*match self.eval_statement(statement) {
                 e => result = e,
-                _ => return None,
             }
+            */
+            let e = self.eval_statement(statement);
+            result = e;
         }
 
         result
     }
 
     fn eval_statement(&mut self, statement: Statement) -> Option<Object> {
-        let mut result = None;
+        let result;
 
         match statement {
             Statement::Expression(e) => result = self.eval_expr(e),
@@ -38,7 +40,7 @@ impl Eval {
     }
 
     fn eval_expr(&mut self, expr: Expression) -> Option<Object> {
-        let mut result = None;
+        let result;
 
         match expr {
             Expression::Ident(ident) => result = Some(self.eval_ident(ident)),
@@ -60,5 +62,11 @@ impl Eval {
             Literal::Int(i) => Object::Int(i),
             _ => Object::String(String::from(".keep")),
         }
+    }
+}
+
+impl Default for Eval {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -1,5 +1,5 @@
 use super::{object::Object, Eval};
-use crate::{ast::*, lexer::Lexer, parser::Parser};
+use crate::{lexer::Lexer, parser::Parser};
 
 #[test]
 fn test_int_eval() {

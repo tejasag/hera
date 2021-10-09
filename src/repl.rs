@@ -15,7 +15,7 @@ pub fn start() {
         let lexer = Lexer::new(input_string);
         let mut parser = Parser::new(lexer);
         let program = parser.parse_program();
-        if parser.errors.len() != 0 {
+        if !parser.errors.is_empty() {
             print_parse_errors(parser.errors);
             continue;
         }
