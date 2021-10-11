@@ -1,7 +1,8 @@
-use crate::{lexer::Lexer, parser::Parser};
+use crate::{eval::Eval, lexer::Lexer, parser::Parser, token::Token};
 use std::io::{stdin, stdout, Write};
 
 pub fn start() {
+    let mut action = "parse";
     loop {
         print!(">>> ");
         let _ = stdout().flush();
@@ -12,24 +13,56 @@ pub fn start() {
             println!("\nPlease enter valid code.");
             continue;
         }
-        let lexer = Lexer::new(input_string);
-        let mut parser = Parser::new(lexer);
-        let program = parser.parse_program();
-        if !parser.errors.is_empty() {
-            print_parse_errors(parser.errors);
-            continue;
+
+        match input_string.as_str() {
+            "eval()\n" => {
+                action = "eval";
+                continue;
+            }
+            "parse()\n" => {
+                action = "parse";
+                continue;
+            }
+            "lex()\n" => {
+                action = "lex";
+                continue;
+            }
+            _ => (),
+        };
+
+        let mut lexer = Lexer::new(input_string);
+
+        match action {
+            "parse" => {
+                let mut parser = Parser::new(lexer);
+                let program = parser.parse_program();
+                if !parser.errors.is_empty() {
+                    print_parse_errors(parser.errors);
+                    continue;
+                }
+                println!("{:#?}", program);
+            }
+            "eval" => {
+                let mut parser = Parser::new(lexer);
+                let program = parser.parse_program();
+                if !parser.errors.is_empty() {
+                    print_parse_errors(parser.errors);
+                    continue;
+                }
+
+                let eval = (Eval::new()).eval(program);
+                println!("{:#?}", eval);
+            }
+            "lex" => {
+                let mut token = lexer.next_token();
+                while token != Token::Eof {
+                    println!("Token: {:?}", token);
+
+                    token = lexer.next_token();
+                }
+            }
+            _ => continue,
         }
-
-        println!("{:#?}", program);
-
-        // let mut token = lexer.next_token();
-
-        /* while token != Token::Eof {
-             println!("Token: {:?}", token);
-
-             token = lexer.next_token();
-         }
-        */
     }
 }
 
