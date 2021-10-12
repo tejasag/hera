@@ -43,13 +43,9 @@ impl Eval {
         match expr {
             Expression::Ident(ident) => Some(self.eval_ident(ident)),
             Expression::Literal(lit) => Some(self.eval_literal(lit)),
-            Expression::Prefix(prefix, right) => {
-                if let Some(expr) = self.eval_expr(*right) {
-                    Some(self.eval_prefix_expr(prefix, expr))
-                } else {
-                    None
-                }
-            }
+            Expression::Prefix(prefix, right) => self
+                .eval_expr(*right)
+                .map(|expr| self.eval_prefix_expr(prefix, expr)),
             _ => None,
         }
     }
