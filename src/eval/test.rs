@@ -14,3 +14,56 @@ fn test_int_eval() {
         assert_eq!(result, expect);
     }
 }
+
+#[test]
+fn test_bool_eval() {
+    let tests = vec![
+        ("true", Some(Object::Bool(true))),
+        ("false", Some(Object::Bool(false))),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}
+
+#[test]
+fn test_not_prefix_eval() {
+    let tests = vec![
+        ("!true", Some(Object::Bool(false))),
+        ("!false", Some(Object::Bool(true))),
+        ("!!true", Some(Object::Bool(true))),
+        ("!1", Some(Object::Bool(false))),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}
+#[test]
+fn test_minus_prefix_eval() {
+    let tests = vec![
+        ("-true", Some(Object::Null)),
+        ("-5", Some(Object::Int(-5))),
+        ("-3498", Some(Object::Int(-3498))),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}

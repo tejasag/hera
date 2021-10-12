@@ -1,4 +1,9 @@
-use crate::{eval::Eval, lexer::Lexer, parser::Parser, token::Token};
+use crate::{
+    eval::{object::Object, Eval},
+    lexer::Lexer,
+    parser::Parser,
+    token::Token,
+};
 use std::io::{stdin, stdout, Write};
 
 pub fn start() {
@@ -51,7 +56,7 @@ pub fn start() {
                 }
 
                 let eval = (Eval::new()).eval(program);
-                println!("{:#?}", eval);
+                println!("{}", eval.unwrap_or(Object::Null));
             }
             "lex" => {
                 let mut token = lexer.next_token();

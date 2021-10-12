@@ -40,15 +40,42 @@ impl Eval {
     }
 
     fn eval_expr(&mut self, expr: Expression) -> Option<Object> {
-        let result;
-
         match expr {
-            Expression::Ident(ident) => result = Some(self.eval_ident(ident)),
-            Expression::Literal(lit) => result = Some(self.eval_literal(lit)),
-            _ => result = None,
+            Expression::Ident(ident) => Some(self.eval_ident(ident)),
+            Expression::Literal(lit) => Some(self.eval_literal(lit)),
+            Expression::Prefix(prefix, right) => {
+                if let Some(expr) = self.eval_expr(*right) {
+                    Some(self.eval_prefix_expr(prefix, expr))
+                } else {
+                    None
+                }
+            }
+            _ => None,
         }
+    }
 
-        result
+    fn eval_prefix_expr(&mut self, prefix: Prefix, expr: Object) -> Object {
+        match prefix {
+            Prefix::Not => self.parse_not_prefix_expr(expr),
+            Prefix::Minus => self.parse_minus_prefix_expr(expr),
+            Prefix::Plus => self.parse_minus_prefix_expr(expr), // TODO: fix this
+        }
+    }
+
+    fn parse_not_prefix_expr(&mut self, expr: Object) -> Object {
+        match expr {
+            Object::Bool(true) => Object::Bool(false),
+            Object::Bool(false) => Object::Bool(true),
+            Object::Null => Object::Bool(true),
+            _ => Object::Bool(false),
+        }
+    }
+
+    fn parse_minus_prefix_expr(&mut self, expr: Object) -> Object {
+        match expr {
+            Object::Int(ref i) => Object::Int(-1 * i),
+            _ => Object::Null,
+        }
     }
 
     fn eval_ident(&mut self, ident: Ident) -> Object {
@@ -60,7 +87,7 @@ impl Eval {
         match lit {
             Literal::String(s) => Object::String(s),
             Literal::Int(i) => Object::Int(i),
-            _ => Object::String(String::from(".keep")),
+            Literal::Bool(b) => Object::Bool(b),
         }
     }
 }
