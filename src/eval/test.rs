@@ -67,3 +67,29 @@ fn test_minus_prefix_eval() {
         assert_eq!(result, expect);
     }
 }
+
+#[test]
+fn test_int_infix_eval() {
+    let tests = vec![
+        ("5 + 5 + 5 + 5 - 10", Some(Object::Int(10))),
+        ("2 * 2 * 2 * 2 * 2", Some(Object::Int(32))),
+        ("-50 + 100 + -50", Some(Object::Int(0))),
+        ("5 * 2 + 10", Some(Object::Int(20))),
+        ("5 + 2 * 10", Some(Object::Int(25))),
+        ("20 + 2 * -10", Some(Object::Int(0))),
+        ("50 / 2 * 2 + 10", Some(Object::Int(60))),
+        ("2 * (5 + 10)", Some(Object::Int(30))),
+        ("3 * 3 * 3 + 10", Some(Object::Int(37))),
+        ("3 * (3 * 3) + 10", Some(Object::Int(37))),
+        ("(5 + 10 * 2 + 15 / 3) * 2 + -10", Some(Object::Int(50))),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}

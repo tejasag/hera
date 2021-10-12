@@ -46,19 +46,28 @@ impl Eval {
             Expression::Prefix(prefix, right) => self
                 .eval_expr(*right)
                 .map(|expr| self.eval_prefix_expr(prefix, expr)),
+            Expression::Infix(infix, left, right) => {
+                let left_expr = self.eval_expr(*left);
+                let right_expr = self.eval_expr(*right);
+                if left_expr.is_some() && right_expr.is_some() {
+                    Some(self.eval_infix_expr(infix, left_expr.unwrap(), right_expr.unwrap()))
+                } else {
+                    None
+                }
+            }
             _ => None,
         }
     }
 
     fn eval_prefix_expr(&mut self, prefix: Prefix, expr: Object) -> Object {
         match prefix {
-            Prefix::Not => self.parse_not_prefix_expr(expr),
-            Prefix::Minus => self.parse_minus_prefix_expr(expr),
-            Prefix::Plus => self.parse_minus_prefix_expr(expr), // TODO: fix this
+            Prefix::Not => self.eval_not_prefix_expr(expr),
+            Prefix::Minus => self.eval_minus_prefix_expr(expr),
+            Prefix::Plus => self.eval_plus_prefix_expr(expr),
         }
     }
 
-    fn parse_not_prefix_expr(&mut self, expr: Object) -> Object {
+    fn eval_not_prefix_expr(&mut self, expr: Object) -> Object {
         match expr {
             Object::Bool(true) => Object::Bool(false),
             Object::Bool(false) => Object::Bool(true),
@@ -67,10 +76,45 @@ impl Eval {
         }
     }
 
-    fn parse_minus_prefix_expr(&mut self, expr: Object) -> Object {
+    fn eval_minus_prefix_expr(&mut self, expr: Object) -> Object {
         match expr {
-            Object::Int(ref i) => Object::Int(-1 * i),
+            Object::Int(i) => Object::Int(-1 * i),
             _ => Object::Null,
+        }
+    }
+
+    fn eval_plus_prefix_expr(&mut self, expr: Object) -> Object {
+        match expr {
+            Object::Int(i) => Object::Int(i),
+            _ => Object::Null,
+        }
+    }
+
+    fn eval_infix_expr(&mut self, infix: Infix, left: Object, right: Object) -> Object {
+        match left {
+            Object::Int(left_expr) => {
+                if let Object::Int(right_expr) = right {
+                    self.eval_int_infix_expr(infix, left_expr, right_expr)
+                } else {
+                    Object::Null
+                }
+            }
+            _ => Object::Null,
+        }
+    }
+
+    fn eval_int_infix_expr(&mut self, infix: Infix, left: i32, right: i32) -> Object {
+        match infix {
+            Infix::Plus => Object::Int(left + right),
+            Infix::Minus => Object::Int(left - right),
+            Infix::Multiply => Object::Int(left * right),
+            Infix::Divide => Object::Int(left / right),
+            Infix::LessThan => Object::Bool(left < right),
+            Infix::LessThanEqual => Object::Bool(left <= right),
+            Infix::GreaterThan => Object::Bool(left > right),
+            Infix::GreaterThanEqual => Object::Bool(left >= right),
+            Infix::Equal => Object::Bool(left == right),
+            Infix::NotEqual => Object::Bool(left != right),
         }
     }
 
