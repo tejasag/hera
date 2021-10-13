@@ -93,3 +93,29 @@ fn test_int_infix_eval() {
         assert_eq!(result, expect);
     }
 }
+
+#[test]
+fn test_if_eval() {
+    let tests = vec![
+        ("if (true) { 10 }", Some(Object::Int(10))),
+        ("if (false) { 10 }", None),
+        ("if (1) { 10 }", Some(Object::Int(10))),
+        ("if (1 < 2) { 10 }", Some(Object::Int(10))),
+        ("if (1 > 2) { 10 }", None),
+        ("if (1 > 2) { 10 } else { 20 }", Some(Object::Int(20))),
+        ("if (1 < 2) { 10 } else { 20 }", Some(Object::Int(10))),
+        ("if (1 <= 2) { 10 }", Some(Object::Int(10))),
+        ("if (1 >= 2) { 10 }", None),
+        ("if (1 >= 2) { 10 } else { 20 }", Some(Object::Int(20))),
+        ("if (1 <= 2) { 10 } else { 20 }", Some(Object::Int(10))),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}

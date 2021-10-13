@@ -7,7 +7,7 @@ use crate::{
 use std::io::{stdin, stdout, Write};
 
 pub fn start() {
-    let mut action = "parse";
+    let mut action = "eval";
     loop {
         print!(">>> ");
         let _ = stdout().flush();
