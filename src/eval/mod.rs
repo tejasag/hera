@@ -13,6 +13,10 @@ impl Eval {
         Eval {}
     }
 
+    fn is_truthy(&mut self, object: Object) -> bool {
+        !matches!(object, Object::Null | Object::Bool(false))
+    }
+
     pub fn eval(&mut self, program: Program) -> Option<Object> {
         let mut result = None;
 
@@ -29,12 +33,19 @@ impl Eval {
     }
 
     fn eval_statement(&mut self, statement: Statement) -> Option<Object> {
-        let result;
-
         match statement {
-            Statement::Expression(e) => result = self.eval_expr(e),
-            _ => return None,
-        };
+            Statement::Expression(e) => self.eval_expr(e),
+            _ => None,
+        }
+    }
+
+    fn eval_block_statement(&mut self, statements: BlockStatement) -> Option<Object> {
+        let mut result = None;
+
+        for statement in statements {
+            let e = self.eval_statement(statement);
+            result = e;
+        }
 
         result
     }
@@ -49,8 +60,26 @@ impl Eval {
             Expression::Infix(infix, left, right) => {
                 let left_expr = self.eval_expr(*left);
                 let right_expr = self.eval_expr(*right);
-                if left_expr.is_some() && right_expr.is_some() {
-                    Some(self.eval_infix_expr(infix, left_expr.unwrap(), right_expr.unwrap()))
+                if let Some(l) = left_expr {
+                    right_expr.map(|r| self.eval_infix_expr(infix, l, r))
+                } else {
+                    None
+                }
+            }
+            Expression::If {
+                condition,
+                consequence,
+                alternative,
+            } => {
+                let cond_expr = match self.eval_expr(*condition) {
+                    Some(e) => e,
+                    None => return None,
+                };
+
+                if self.is_truthy(cond_expr) {
+                    self.eval_block_statement(consequence)
+                } else if let Some(a) = alternative {
+                    self.eval_block_statement(a)
                 } else {
                     None
                 }
@@ -78,7 +107,7 @@ impl Eval {
 
     fn eval_minus_prefix_expr(&mut self, expr: Object) -> Object {
         match expr {
-            Object::Int(i) => Object::Int(-1 * i),
+            Object::Int(i) => Object::Int(-i),
             _ => Object::Null,
         }
     }
