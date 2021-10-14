@@ -119,3 +119,32 @@ fn test_if_eval() {
         assert_eq!(result, expect);
     }
 }
+
+#[test]
+fn test_return_eval() {
+    let tests = vec![
+        ("return 10;", Some(Object::Int(10))),
+        ("return 10; 9;", Some(Object::Int(10))),
+        ("return 2 * 5; 9;", Some(Object::Int(10))),
+        ("9; return 2 * 5; 9;", Some(Object::Int(10))),
+        (
+            r#"
+if (10 > 1) {
+  if (10 > 1) {
+    return 10;
+  }
+  return 1;
+}"#,
+            Some(Object::Int(10)),
+        ),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}

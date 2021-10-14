@@ -21,12 +21,10 @@ impl Eval {
         let mut result = None;
 
         for statement in program.statements {
-            /*match self.eval_statement(statement) {
+            match self.eval_statement(statement) {
+                Some(Object::Return(val)) => return Some(*val),
                 e => result = e,
             }
-            */
-            let e = self.eval_statement(statement);
-            result = e;
         }
 
         result
