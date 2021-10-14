@@ -35,6 +35,14 @@ impl Eval {
     fn eval_statement(&mut self, statement: Statement) -> Option<Object> {
         match statement {
             Statement::Expression(e) => self.eval_expr(e),
+            Statement::Return(e) => {
+                let val = match self.eval_expr(e) {
+                    Some(v) => v,
+                    None => return None,
+                };
+
+                Some(Object::Return(Box::new(val)))
+            }
             _ => None,
         }
     }
@@ -43,8 +51,10 @@ impl Eval {
         let mut result = None;
 
         for statement in statements {
-            let e = self.eval_statement(statement);
-            result = e;
+            match self.eval_statement(statement) {
+                Some(Object::Return(e)) => return Some(Object::Return(e)),
+                e => result = e,
+            }
         }
 
         result
