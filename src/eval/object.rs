@@ -8,6 +8,7 @@ pub enum Object {
     Bool(bool),
     Null,
     Return(Box<Object>),
+    Error(String),
 }
 
 impl fmt::Display for Object {
@@ -18,6 +19,7 @@ impl fmt::Display for Object {
             Object::Bool(ref value) => write!(f, "{}", value),
             Object::Null => write!(f, "null"),
             Object::Return(ref value) => write!(f, "{}", value),
+            Object::Error(ref value) => write!(f, "{}", value),
         }
     }
 }
