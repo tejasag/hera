@@ -116,14 +116,14 @@ impl Eval {
     fn eval_minus_prefix_expr(&mut self, expr: Object) -> Object {
         match expr {
             Object::Int(i) => Object::Int(-i),
-            _ => Object::Null,
+            _ => Object::Error(format!("unknown operator: -{}", expr)),
         }
     }
 
     fn eval_plus_prefix_expr(&mut self, expr: Object) -> Object {
         match expr {
             Object::Int(i) => Object::Int(i),
-            _ => Object::Null,
+            _ => Object::Error(format!("unknown operator: {}", expr)),
         }
     }
 
@@ -133,10 +133,10 @@ impl Eval {
                 if let Object::Int(right_expr) = right {
                     self.eval_int_infix_expr(infix, left_expr, right_expr)
                 } else {
-                    Object::Null
+                    Object::Error(format!("type mismatch: {} {} {}", left, infix, right))
                 }
             }
-            _ => Object::Null,
+            _ => Object::Error(format!("unknown operator: {} {} {}", left, infix, right)),
         }
     }
 
