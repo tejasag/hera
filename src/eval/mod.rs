@@ -17,6 +17,10 @@ impl Eval {
         !matches!(object, Object::Null | Object::Bool(false))
     }
 
+    fn is_error(&mut self, object: Object) -> bool {
+        matches!(object, Object::Error(_))
+    }
+
     pub fn eval(&mut self, program: Program) -> Option<Object> {
         let mut result = None;
 
