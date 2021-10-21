@@ -36,7 +36,6 @@ fn test_bool_eval() {
 fn test_not_prefix_eval() {
     let tests = vec![
         ("!true", Some(Object::Bool(false))),
-        ("!false", Some(Object::Bool(true))),
         ("!!true", Some(Object::Bool(true))),
         ("!1", Some(Object::Bool(false))),
     ];
