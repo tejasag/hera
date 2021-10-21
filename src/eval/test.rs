@@ -54,6 +54,7 @@ fn test_not_prefix_eval() {
 fn test_minus_prefix_eval() {
     let tests = vec![
         ("-true", Some(Object::Null)),
+        ("-false", Some(Object::Null)),
         ("-5", Some(Object::Int(-5))),
         ("-3498", Some(Object::Int(-3498))),
     ];
