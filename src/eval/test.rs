@@ -146,3 +146,59 @@ if (10 > 1) {
         assert_eq!(result, expect);
     }
 }
+
+#[test]
+fn test_error_handling() {
+    let tests = vec![
+        (
+            "5 + true",
+            Some(Object::Error(String::from("type mismatch: 5 + true"))),
+        ),
+        (
+            "5 + true; 5; ",
+            Some(Object::Error(String::from("type mismatch: 5 + true"))),
+        ),
+        (
+            "-true",
+            Some(Object::Error(String::from("unknown operator: -true"))),
+        ),
+        (
+            "true + false",
+            Some(Object::Error(String::from(
+                "unknown operator: true + false",
+            ))),
+        ),
+        (
+            "5; true + false; 5",
+            Some(Object::Error(String::from(
+                "unknown operator: true + false",
+            ))),
+        ),
+        (
+            "if (10 > 1) { true + false; }",
+            Some(Object::Error(String::from(
+                "unknown operator: true + false",
+            ))),
+        ),
+        (
+            "if (10 > 1) {
+                if (10 > 1) {
+                    return true + false;
+                }
+                return 1;
+             }",
+            Some(Object::Error(String::from(
+                "unknown operator: true + false",
+            ))),
+        ),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}

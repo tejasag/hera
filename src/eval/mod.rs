@@ -27,6 +27,7 @@ impl Eval {
 
         for statement in program.statements {
             match self.eval_statement(statement) {
+                Some(Object::Error(val)) => return Some(Object::Error(val)),
                 Some(Object::Return(val)) => return Some(*val),
                 e => result = e,
             }

@@ -18,7 +18,7 @@ impl fmt::Display for Object {
             Object::Bool(ref value) => write!(f, "{}", value),
             Object::Null => write!(f, "null"),
             Object::Return(ref value) => write!(f, "{}", value),
-            Object::Error(ref value) => write!(f, "ERROR: {}", value),
+            Object::Error(ref value) => write!(f, "{}", value),
         }
     }
 }
