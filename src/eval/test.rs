@@ -191,6 +191,24 @@ fn test_error_handling() {
                 "unknown operator: true + false",
             ))),
         ),
+        (
+            "1+(true+false)",
+            Some(Object::Error(String::from(
+                "unknown operator: true + false",
+            ))),
+        ),
+        (
+            "(true+false)+1",
+            Some(Object::Error(String::from(
+                "unknown operator: true + false",
+            ))),
+        ),
+        (
+            "(true+false)+(true+false)",
+            Some(Object::Error(String::from(
+                "unknown operator: true + false",
+            ))),
+        ),
     ];
 
     for (input, expect) in tests {

@@ -17,10 +17,9 @@ impl Eval {
         !matches!(object, Object::Null | Object::Bool(false))
     }
 
-    /*    fn is_error(&mut self, object: Object) -> bool {
-            matches!(object, Object::Error(_))
-        }
-    */
+    fn is_error(&mut self, object: Object) -> bool {
+        matches!(object, Object::Error(_))
+    }
 
     pub fn eval(&mut self, program: Program) -> Option<Object> {
         let mut result = None;
@@ -57,6 +56,7 @@ impl Eval {
         for statement in statements {
             match self.eval_statement(statement) {
                 Some(Object::Return(e)) => return Some(Object::Return(e)),
+                Some(Object::Error(e)) => return Some(Object::Error(e)),
                 e => result = e,
             }
         }
@@ -74,8 +74,14 @@ impl Eval {
             Expression::Infix(infix, left, right) => {
                 let left_expr = self.eval_expr(*left);
                 let right_expr = self.eval_expr(*right);
-                if let Some(l) = left_expr {
-                    right_expr.map(|r| self.eval_infix_expr(infix, l, r))
+                if left_expr.is_some() && right_expr.is_some() {
+                    if self.is_error(left_expr.clone().unwrap()) {
+                        return left_expr;
+                    }
+                    if self.is_error(right_expr.clone().unwrap()) {
+                        return right_expr;
+                    }
+                    right_expr.map(|r| self.eval_infix_expr(infix, left_expr.unwrap(), r))
                 } else {
                     None
                 }
@@ -103,6 +109,9 @@ impl Eval {
     }
 
     fn eval_prefix_expr(&mut self, prefix: Prefix, expr: Object) -> Object {
+        if self.is_error(expr.clone()) {
+            return expr;
+        }
         match prefix {
             Prefix::Not => self.eval_not_prefix_expr(expr),
             Prefix::Minus => self.eval_minus_prefix_expr(expr),
