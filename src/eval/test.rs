@@ -209,6 +209,32 @@ fn test_error_handling() {
                 "unknown operator: true + false",
             ))),
         ),
+        (
+            "foobar",
+            Some(Object::Error(String::from("identifier not found: foobar"))),
+        ),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+        let mut evaluator = Eval::new();
+        let result = evaluator.eval(program);
+
+        assert_eq!(result, expect);
+    }
+}
+
+#[test]
+fn test_let_statements() {
+    let tests = vec![
+        ("let a = 5; a", Some(Object::Int(5))),
+        ("let a = 5 * 5; a", Some(Object::Int(25))),
+        ("let a = 5; let b = a; b", Some(Object::Int(5))),
+        (
+            "let a = 5; let b = a; let c = a + b + 5; c;",
+            Some(Object::Int(15)),
+        ),
     ];
 
     for (input, expect) in tests {

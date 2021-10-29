@@ -1,10 +1,13 @@
+pub mod env;
 pub mod object;
-
-use crate::ast::*;
-use object::Object;
 
 #[cfg(test)]
 pub mod test;
+
+use crate::ast::*;
+
+use env::Env;
+use object::Object;
 
 pub struct Eval;
 
@@ -21,7 +24,7 @@ impl Eval {
         matches!(object, Object::Error(_))
     }
 
-    pub fn eval(&mut self, program: Program) -> Option<Object> {
+    pub fn eval(&mut self, program: Program, _env: Env) -> Option<Object> {
         let mut result = None;
 
         for statement in program.statements {

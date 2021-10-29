@@ -1,5 +1,5 @@
 use crate::{
-    eval::{object::Object, Eval},
+    eval::{env::Env, object::Object, Eval},
     lexer::Lexer,
     parser::Parser,
     token::Token,
@@ -8,6 +8,7 @@ use std::io::{stdin, stdout, Write};
 
 pub fn start() {
     let mut action = "eval";
+    let env = Env::new();
     loop {
         print!(">>> ");
         let _ = stdout().flush();
@@ -55,7 +56,7 @@ pub fn start() {
                     continue;
                 }
 
-                let eval = (Eval::new()).eval(program);
+                let eval = (Eval::new()).eval(program, env.clone());
                 println!("{}", eval.unwrap_or(Object::Null));
             }
             "lex" => {
