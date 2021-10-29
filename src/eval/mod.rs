@@ -74,16 +74,17 @@ impl Eval {
             Expression::Infix(infix, left, right) => {
                 let left_expr = self.eval_expr(*left);
                 let right_expr = self.eval_expr(*right);
-                if left_expr.is_some() && right_expr.is_some() {
-                    if self.is_error(left_expr.clone().unwrap()) {
-                        return left_expr;
+                match left_expr.clone() {
+                    Some(l) => {
+                        if self.is_error(l) {
+                            return left_expr;
+                        }
+                        if self.is_error(right_expr.clone().unwrap()) {
+                            return right_expr;
+                        }
+                        right_expr.map(|r| self.eval_infix_expr(infix, left_expr.unwrap(), r))
                     }
-                    if self.is_error(right_expr.clone().unwrap()) {
-                        return right_expr;
-                    }
-                    right_expr.map(|r| self.eval_infix_expr(infix, left_expr.unwrap(), r))
-                } else {
-                    None
+                    _ => None,
                 }
             }
             Expression::If {
