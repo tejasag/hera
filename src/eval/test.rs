@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 use super::{env::Env, object::Object, Eval};
 use crate::{lexer::Lexer, parser::Parser};
 
@@ -6,8 +8,8 @@ fn test(tests: Vec<(&str, Option<Object>)>) {
         let mut parser = Parser::new(Lexer::new(input.to_string()));
         let program = parser.parse_program();
         let env = Env::new();
-        let mut evaluator = Eval::new();
-        let result = evaluator.eval(program, env);
+        let mut evaluator = Eval::new(Rc::new(RefCell::new(env)));
+        let result = evaluator.eval(program);
 
         assert_eq!(result, expect);
     }

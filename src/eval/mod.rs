@@ -5,26 +5,28 @@ pub mod object;
 pub mod test;
 
 use crate::ast::*;
-
 use env::Env;
 use object::Object;
+use std::{cell::RefCell, rc::Rc};
 
-pub struct Eval;
+pub struct Eval {
+    env: Rc<RefCell<Env>>,
+}
 
 impl Eval {
-    pub fn new() -> Self {
-        Eval {}
+    pub fn new(env: Rc<RefCell<Env>>) -> Self {
+        Eval { env }
     }
 
     fn is_truthy(&mut self, object: Object) -> bool {
         !matches!(object, Object::Null | Object::Bool(false))
     }
 
-    fn is_error(&mut self, object: Object) -> bool {
+    fn is_error(&mut self, object: &Object) -> bool {
         matches!(object, Object::Error(_))
     }
 
-    pub fn eval(&mut self, program: Program, _env: Env) -> Option<Object> {
+    pub fn eval(&mut self, program: Program) -> Option<Object> {
         let mut result = None;
 
         for statement in program.statements {
@@ -49,7 +51,19 @@ impl Eval {
 
                 Some(Object::Return(Box::new(val)))
             }
-            _ => None,
+            Statement::Let(i, v) => {
+                let val = match self.eval_expr(v) {
+                    Some(value) => value,
+                    None => return None,
+                };
+                if self.is_error(&val) {
+                    Some(val)
+                } else {
+                    let Ident(name) = i;
+                    self.env.borrow_mut().set(name, val);
+                    None
+                }
+            }
         }
     }
 
@@ -79,10 +93,10 @@ impl Eval {
                 let right_expr = self.eval_expr(*right);
                 match left_expr.clone() {
                     Some(l) => {
-                        if self.is_error(l) {
+                        if self.is_error(&l) {
                             return left_expr;
                         }
-                        if self.is_error(right_expr.clone().unwrap()) {
+                        if self.is_error(&right_expr.clone().unwrap()) {
                             return right_expr;
                         }
                         right_expr.map(|r| self.eval_infix_expr(infix, left_expr.unwrap(), r))
@@ -113,7 +127,7 @@ impl Eval {
     }
 
     fn eval_prefix_expr(&mut self, prefix: Prefix, expr: Object) -> Object {
-        if self.is_error(expr.clone()) {
+        if self.is_error(&expr) {
             return expr;
         }
         match prefix {
@@ -176,7 +190,10 @@ impl Eval {
 
     fn eval_ident(&mut self, ident: Ident) -> Object {
         let Ident(i) = ident;
-        Object::String(i)
+        match self.env.borrow_mut().get(&i) {
+            Some(i) => i,
+            None => Object::Error(format!("identifier not found: {}", i)),
+        }
     }
 
     fn eval_literal(&mut self, lit: Literal) -> Object {
@@ -185,11 +202,5 @@ impl Eval {
             Literal::Int(i) => Object::Int(i),
             Literal::Bool(b) => Object::Bool(b),
         }
-    }
-}
-
-impl Default for Eval {
-    fn default() -> Self {
-        Self::new()
     }
 }

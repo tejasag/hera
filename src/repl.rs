@@ -4,7 +4,11 @@ use crate::{
     parser::Parser,
     token::Token,
 };
-use std::io::{stdin, stdout, Write};
+use std::{
+    cell::RefCell,
+    io::{stdin, stdout, Write},
+    rc::Rc,
+};
 
 pub fn start() {
     let mut action = "eval";
@@ -56,7 +60,7 @@ pub fn start() {
                     continue;
                 }
 
-                let eval = (Eval::new()).eval(program, env.clone());
+                let eval = (Eval::new(Rc::new(RefCell::new(env.clone())))).eval(program);
                 println!("{}", eval.unwrap_or(Object::Null));
             }
             "lex" => {

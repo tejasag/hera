@@ -13,12 +13,33 @@ impl Env {
         }
     }
 
-    pub fn get(&self, name: String) -> Option<Object> {
-        self.store.get(&name).cloned()
+    pub fn get(&mut self, name: &str) -> Option<Object> {
+        println!("{:#?}", self.store);
+        println!("name is: {}", &name);
+        match self.store.get(name) {
+            Some(e) => {
+                println!("found! {:?}", e);
+                Some(e).cloned()
+            }
+            None => {
+                println!("not found :/");
+                None
+            }
+        }
     }
 
     pub fn set(&mut self, name: String, val: Object) -> Option<Object> {
-        self.store.insert(name, val)
+        println!("{:#?}", self.store);
+        println!("val: {:?}\nname: {:?}", val, name);
+        match self.store.insert(name.clone(), val) {
+            Some(e) => Some(e),
+            None => {
+                println!("bruh");
+                println!("updated store: {:#?}", self.store);
+                println!("get value: {:#?}", self.get(&name));
+                None
+            }
+        }
     }
 }
 
