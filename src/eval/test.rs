@@ -1,7 +1,11 @@
 use std::{cell::RefCell, rc::Rc};
 
 use super::{env::Env, object::Object, Eval};
-use crate::{lexer::Lexer, parser::Parser};
+use crate::{
+    ast::{Expression, Ident, Infix, Literal, Statement},
+    lexer::Lexer,
+    parser::Parser,
+};
 
 fn test(tests: Vec<(&str, Option<Object>)>) {
     for (input, expect) in tests {
@@ -191,6 +195,57 @@ fn test_let_statements() {
         (
             "let a = 5; let b = a; let c = a + b + 5; c;",
             Some(Object::Int(15)),
+        ),
+    ];
+
+    test(tests);
+}
+
+#[test]
+fn test_fn_object() {
+    let tests = vec![(
+        "fn (x) {x+2}",
+        Some(Object::Fn(
+            vec![Ident(String::from("x"))],
+            vec![Statement::Expression(Expression::Infix(
+                Infix::Plus,
+                Box::new(Expression::Ident(Ident(String::from("x")))),
+                Box::new(Expression::Literal(Literal::Int(2))),
+            ))],
+            Rc::new(RefCell::new(Env::new())),
+        )),
+    )];
+
+    test(tests);
+}
+
+#[test]
+fn test_fn_application() {
+    let tests = vec![
+        (
+            "let identity = fn(x) { x; }; identity(5);",
+            Some(Object::Int(5)),
+        ),
+        (
+            "let identity = fn(x) { return x; }; identity(5);",
+            Some(Object::Int(5)),
+        ),
+        (
+            "let double = fn(x) { x * 2; }; double(5);",
+            Some(Object::Int(10)),
+        ),
+        (
+            "let add = fn(x, y) { x + y; }; add(5, 5);",
+            Some(Object::Int(10)),
+        ),
+        (
+            "let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));",
+            Some(Object::Int(20)),
+        ),
+        ("fn(x) { x; }(5)", Some(Object::Int(5))),
+        (
+            "fn(a) { let f = fn(b) { a + b }; f(a); }(5);",
+            Some(Object::Int(10)),
         ),
     ];
 

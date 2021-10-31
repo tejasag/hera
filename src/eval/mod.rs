@@ -122,7 +122,8 @@ impl Eval {
                     None
                 }
             }
-            _ => None,
+            Expression::Fn { params, body } => Some(Object::Fn(params, body, self.env.clone())),
+            Expression::Call { function, args } => Some(self.eval_call_expr(*function, args)),
         }
     }
 
@@ -186,6 +187,39 @@ impl Eval {
             Infix::Equal => Object::Bool(left == right),
             Infix::NotEqual => Object::Bool(left != right),
         }
+    }
+
+    fn eval_call_expr(&mut self, function: Expression, args: Vec<Expression>) -> Object {
+        let args = args
+            .iter()
+            .map(|a| self.eval_expr(a.clone()).unwrap_or(Object::Null))
+            .collect::<Vec<_>>();
+
+        let (params, body, env) = match self.eval_expr(function) {
+            Some(Object::Fn(params, body, env)) => (params, body, env),
+            Some(o) => return Object::Error(format!("function not found: {}", o)),
+            None => return Object::Null,
+        };
+
+        if params.len() != args.len() {
+            return Object::Error(format!(
+                "expected {} arguments but {} were given",
+                args.len(),
+                params.len()
+            ));
+        }
+
+        let current_env = Rc::clone(&self.env);
+        let mut scoped_env = Env::new_enclosed(Rc::clone(&env));
+        let list = params.iter().zip(args.iter());
+        for (_, (ident, arg)) in list.enumerate() {
+            let Ident(name) = ident.clone();
+            scoped_env.set(name, arg.to_owned());
+        }
+        self.env = Rc::new(RefCell::new(scoped_env));
+        let object = self.eval_block_statement(body);
+        self.env = current_env;
+        object.unwrap_or(Object::Null)
     }
 
     fn eval_ident(&mut self, ident: Ident) -> Object {
