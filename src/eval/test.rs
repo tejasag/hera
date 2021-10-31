@@ -173,18 +173,17 @@ fn test_error_handling() {
                 "unknown operator: true + false",
             ))),
         ),
-        /*    (
+        (
             "foobar",
             Some(Object::Error(String::from("identifier not found: foobar"))),
         ),
-        */
     ];
 
     test(tests);
 }
 
-// #[test]
-fn _test_let_statements() {
+#[test]
+fn test_let_statements() {
     let tests = vec![
         ("let a = 5; a", Some(Object::Int(5))),
         ("let a = 5 * 5; a", Some(Object::Int(25))),
