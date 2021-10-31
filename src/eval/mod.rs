@@ -10,7 +10,7 @@ use object::Object;
 use std::{cell::RefCell, rc::Rc};
 
 pub struct Eval {
-    env: Rc<RefCell<Env>>,
+    pub env: Rc<RefCell<Env>>,
 }
 
 impl Eval {
