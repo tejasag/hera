@@ -18,7 +18,7 @@ impl Env {
     }
 
     pub fn set(&mut self, name: String, val: Object) -> Option<Object> {
-        self.store.insert(name.clone(), val)
+        self.store.insert(name, val)
     }
 }
 
