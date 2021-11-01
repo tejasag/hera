@@ -195,6 +195,10 @@ impl Eval {
             .map(|a| self.eval_expr(a.clone()).unwrap_or(Object::Null))
             .collect::<Vec<_>>();
 
+        self.apply_function(function, args)
+    }
+
+    fn apply_function(&mut self, function: Expression, args: Vec<Object>) -> Object {
         let (params, body, env) = match self.eval_expr(function) {
             Some(Object::Fn(params, body, env)) => (params, body, env),
             Some(o) => return Object::Error(format!("function not found: {}", o)),
@@ -203,23 +207,42 @@ impl Eval {
 
         if params.len() != args.len() {
             return Object::Error(format!(
-                "expected {} arguments but {} were given",
-                args.len(),
-                params.len()
+                "expected arguments: {}\ngiven arguments: {}",
+                params.len(),
+                args.len()
             ));
-        }
+        };
 
         let current_env = Rc::clone(&self.env);
-        let mut scoped_env = Env::new_enclosed(Rc::clone(&env));
-        let list = params.iter().zip(args.iter());
-        for (_, (ident, arg)) in list.enumerate() {
-            let Ident(name) = ident.clone();
-            scoped_env.set(name, arg.to_owned());
-        }
-        self.env = Rc::new(RefCell::new(scoped_env));
-        let object = self.eval_block_statement(body);
+        let extended_env = self.extended_function_env(params, env, args);
+        self.env = Rc::new(RefCell::new(extended_env));
+        let evaluated = self.eval_block_statement(body);
         self.env = current_env;
-        object.unwrap_or(Object::Null)
+        self.unwrap_return_value(evaluated)
+    }
+
+    fn extended_function_env(
+        &mut self,
+        params: Vec<Ident>,
+        env: Rc<RefCell<Env>>,
+        args: Vec<Object>,
+    ) -> Env {
+        let mut scope_env = Env::new_enclosed(env);
+
+        for (ident, arg) in params.iter().zip(args.iter()) {
+            let Ident(name) = ident.clone();
+            scope_env.set(name, arg.to_owned());
+        }
+
+        scope_env
+    }
+
+    fn unwrap_return_value(&mut self, obj: Option<Object>) -> Object {
+        match obj {
+            Some(Object::Return(o)) => *o,
+            Some(o) => o,
+            None => Object::Null,
+        }
     }
 
     fn eval_ident(&mut self, ident: Ident) -> Object {

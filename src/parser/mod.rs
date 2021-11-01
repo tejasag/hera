@@ -306,8 +306,23 @@ impl Parser {
         self.next_token();
         match self.current_token {
             Token::Ident(ref mut ident) => idents.push(Ident(ident.clone())),
-            _ => return None,
+            _ => {
+                self.errors.push(String::from(
+                    "Expected function parameter to be an identifier.",
+                ));
+                return None;
+            }
         };
+
+        match self.peek_token {
+            Token::Comma | Token::RParen => (),
+            _ => {
+                self.errors.push(String::from(
+                    "Expected function parameters to be seperated by a comma.`",
+                ));
+                return None;
+            }
+        }
 
         while self.peek_token_is(&Token::Comma) {
             self.next_token();
