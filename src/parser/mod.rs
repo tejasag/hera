@@ -314,16 +314,6 @@ impl Parser {
             }
         };
 
-        match self.peek_token {
-            Token::Comma | Token::RParen => (),
-            _ => {
-                self.errors.push(String::from(
-                    "Expected function parameters to be seperated by a comma.`",
-                ));
-                return None;
-            }
-        }
-
         while self.peek_token_is(&Token::Comma) {
             self.next_token();
             self.next_token();
