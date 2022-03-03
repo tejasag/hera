@@ -138,9 +138,10 @@ impl Parser {
     fn parse_expression(&mut self, precedence: Precedence) -> Option<Expression> {
         // prefix
         let mut left: Option<Expression> = match self.current_token {
-            Token::Ident(_) => self.parse_ident(),
             Token::Int(_) => self.parse_int_literal(),
             Token::Bool(_) => self.parse_bool_literal(),
+            Token::Str(_) => self.parse_string_literal(),
+            Token::Ident(_) => self.parse_ident(),
             Token::Bang | Token::Minus | Token::Plus => self.parse_prefix_expression(),
             Token::LParen => self.parse_grouped_expression(),
             Token::If => self.parse_if_expression(),
@@ -188,6 +189,13 @@ impl Parser {
     fn parse_bool_literal(&mut self) -> Option<Expression> {
         match self.current_token {
             Token::Bool(boolean) => Some(Expression::Literal(Literal::Bool(boolean))),
+            _ => None,
+        }
+    }
+
+    fn parse_string_literal(&mut self) -> Option<Expression> {
+        match self.current_token {
+            Token::Str(ref mut str) => Some(Expression::Literal(Literal::String(str.clone()))),
             _ => None,
         }
     }

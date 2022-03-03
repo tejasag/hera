@@ -25,6 +25,8 @@ if (5 < 10) {
 9 != 10;
 
 let result = add(five, ten);
+\"foobar\"
+\"foo bar\"
 ";
 
     let tests: Vec<Token> = vec![
@@ -101,6 +103,8 @@ let result = add(five, ten);
         Ident("ten".to_string()),
         RParen,
         SemiColon,
+        Str(String::from("foobar")),
+        Str(String::from("foo bar")),
     ];
 
     let mut l = Lexer::new(input.to_string());

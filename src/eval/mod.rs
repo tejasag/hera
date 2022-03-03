@@ -170,6 +170,20 @@ impl Eval {
                     Object::Error(format!("type mismatch: {} {} {}", left, infix, right))
                 }
             }
+            Object::String(left_expr) => {
+                if let Object::String(right_expr) = right {
+                    self.eval_string_infix_expr(infix, left_expr, right_expr)
+                } else {
+                    Object::Error(format!("type mismatch: {} {} {}", left_expr, infix, right))
+                }
+            }
+            _ => Object::Error(format!("unknown operator: {} {} {}", left, infix, right)),
+        }
+    }
+
+    fn eval_string_infix_expr(&mut self, infix: Infix, left: String, right: String) -> Object {
+        match infix {
+            Infix::Plus => Object::String(format!("{}{}", left, right)),
             _ => Object::Error(format!("unknown operator: {} {} {}", left, infix, right)),
         }
     }

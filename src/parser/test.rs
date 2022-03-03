@@ -84,6 +84,22 @@ pub fn test_ident_expression() {
 }
 
 #[test]
+pub fn test_string_literal_expression() {
+    let input: String = String::from("\"hello world\"");
+
+    let l = Lexer::new(input);
+    let mut p = Parser::new(l);
+    let program = p.parse_program();
+    check_parse_errors(p);
+    assert_eq!(
+        vec![Statement::Expression(Expression::Literal(Literal::String(
+            String::from("hello world")
+        )))],
+        program.statements
+    )
+}
+
+#[test]
 pub fn test_int_literal_expression() {
     let input: String = String::from("5;");
 

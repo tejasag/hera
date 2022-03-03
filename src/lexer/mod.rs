@@ -95,6 +95,7 @@ impl Lexer {
                     Token::Gt
                 }
             }
+            '"' => Token::Str(self.read_string()),
             '\u{0}' => Token::Eof,
             _ => {
                 if is_letter(self.ch) {
@@ -130,6 +131,17 @@ impl Lexer {
             self.read_char();
         }
         self.input[pos..self.position].parse::<i32>().unwrap()
+    }
+
+    fn read_string(&mut self) -> String {
+        let pos: usize = self.position + 1;
+        loop {
+            self.read_char();
+            if self.ch == '"' || self.ch == (0 as char) {
+                break;
+            }
+        }
+        self.input[pos..self.position].to_string()
     }
 
     fn skip_whitespace(&mut self) {

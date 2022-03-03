@@ -36,6 +36,33 @@ fn test_bool_eval() {
 }
 
 #[test]
+fn test_string_eval() {
+    let tests = vec![
+        (
+            "\"hello world\"",
+            Some(Object::String(String::from("hello world"))),
+        ),
+        ("\"foobar\"", Some(Object::String(String::from("foobar")))),
+    ];
+    test(tests);
+}
+
+#[test]
+fn test_string_concatenation_eval() {
+    let tests = vec![
+        (
+            "\"Hello \" + \"World\"",
+            Some(Object::String(String::from("Hello World"))),
+        ),
+        (
+            "\"Foo \" + \"Bar\"",
+            Some(Object::String(String::from("Foo Bar"))),
+        ),
+    ];
+    test(tests);
+}
+
+#[test]
 fn test_not_prefix_eval() {
     let tests = vec![
         ("!true", Some(Object::Bool(false))),
