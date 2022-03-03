@@ -2,6 +2,8 @@ use super::env::Env;
 use crate::ast::{BlockStatement, Ident};
 use std::{cell::RefCell, fmt, rc::Rc};
 
+pub type BuiltlnFn = fn(Vec<Object>) -> Object;
+
 #[derive(PartialEq, Clone, Debug)]
 pub enum Object {
     Int(i32),
@@ -11,6 +13,7 @@ pub enum Object {
     Return(Box<Object>),
     Error(String),
     Fn(Vec<Ident>, BlockStatement, Rc<RefCell<Env>>),
+    Builtin(BuiltlnFn),
 }
 
 impl fmt::Display for Object {
@@ -33,6 +36,7 @@ impl fmt::Display for Object {
                 }
                 write!(f, "fn({}) {{ ... }}", result)
             }
+            Object::Builtin(_) => write!(f, "[builtin fn]"),
         }
     }
 }

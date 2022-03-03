@@ -9,11 +9,8 @@ use crate::{
 
 fn test(tests: Vec<(&str, Option<Object>)>) {
     for (input, expect) in tests {
-        let mut parser = Parser::new(Lexer::new(input.to_string()));
-        let program = parser.parse_program();
-        let env = Env::new();
-        let mut evaluator = Eval::new(Rc::new(RefCell::new(env)));
-        let result = evaluator.eval(program);
+        let result = Eval::new(Rc::new(RefCell::new(Env::new())))
+            .eval(Parser::new(Lexer::new(input.to_string())).parse_program());
 
         assert_eq!(result, expect);
     }
@@ -276,5 +273,27 @@ fn test_fn_application() {
         ),
     ];
 
+    test(tests);
+}
+
+#[test]
+fn test_builtin_functions() {
+    let tests = vec![
+        ("len(\"\")", Some(Object::Int(0))),
+        ("len(\"four\")", Some(Object::Int(4))),
+        ("len(\"hello world\")", Some(Object::Int(11))),
+        (
+            "len(1)",
+            Some(Object::Error(
+                "argument to `len` not supported, got 1".to_string(),
+            )),
+        ),
+        (
+            "len(\"one\", \"two\")",
+            Some(Object::Error(String::from(
+                "expected arguments: 1\ngiven arguments: 2",
+            ))),
+        ),
+    ];
     test(tests);
 }

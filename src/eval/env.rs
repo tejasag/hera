@@ -15,6 +15,10 @@ impl Env {
         }
     }
 
+    pub fn from(store: HashMap<String, Object>) -> Self {
+        Self { store, outer: None }
+    }
+
     pub fn new_enclosed(outer: Rc<RefCell<Env>>) -> Self {
         Self {
             store: HashMap::new(),

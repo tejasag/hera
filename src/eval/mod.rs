@@ -1,3 +1,4 @@
+pub mod builtins;
 pub mod env;
 pub mod object;
 
@@ -5,6 +6,7 @@ pub mod object;
 pub mod test;
 
 use crate::ast::*;
+use builtins::new_builtins;
 use env::Env;
 use object::Object;
 use std::{cell::RefCell, rc::Rc};
@@ -215,6 +217,7 @@ impl Eval {
     fn apply_function(&mut self, function: Expression, args: Vec<Object>) -> Object {
         let (params, body, env) = match self.eval_expr(function) {
             Some(Object::Fn(params, body, env)) => (params, body, env),
+            Some(Object::Builtin(func)) => return func(args),
             Some(o) => return Object::Error(format!("function not found: {}", o)),
             None => return Object::Null,
         };
@@ -261,6 +264,10 @@ impl Eval {
 
     fn eval_ident(&mut self, ident: Ident) -> Object {
         let Ident(i) = ident;
+        let builtins = new_builtins();
+        if builtins.contains_key(&i) {
+            return builtins.get(&i).unwrap().clone();
+        };
         match self.env.borrow_mut().get(&i) {
             Some(i) => i,
             None => Object::Error(format!("identifier not found: {}", i)),
