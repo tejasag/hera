@@ -1,0 +1,15 @@
+let map = fn (arr, f) {
+    let iter = fn (array, acc ) {
+        if (len(array) == 0) {
+            acc
+        } else {
+            let n = tail(array);
+            let res = f(array[0]);
+            iter(n, push(acc, res));
+        };
+    };
+    iter(arr, [])
+};
+
+
+

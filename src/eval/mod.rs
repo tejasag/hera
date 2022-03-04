@@ -1,5 +1,6 @@
 pub mod builtins;
 pub mod env;
+pub mod libs;
 pub mod object;
 
 #[cfg(test)]
@@ -10,6 +11,8 @@ use builtins::new_builtins;
 use env::Env;
 use object::Object;
 use std::{cell::RefCell, rc::Rc};
+
+use self::libs::load_lib;
 
 pub struct Eval {
     pub env: Rc<RefCell<Env>>,
@@ -64,6 +67,13 @@ impl Eval {
                     let Ident(name) = i;
                     self.env.borrow_mut().set(name, val);
                     None
+                }
+            }
+            Statement::Import(i) => {
+                let Ident(lib) = i;
+                match self.extend_global_env(lib) {
+                    Some(o) => Some(o),
+                    None => return None,
                 }
             }
         }
@@ -205,6 +215,7 @@ impl Eval {
             Infix::Minus => Object::Int(left - right),
             Infix::Multiply => Object::Int(left * right),
             Infix::Divide => Object::Int(left / right),
+            Infix::Modulus => Object::Int(left % right),
             Infix::LessThan => Object::Bool(left < right),
             Infix::LessThanEqual => Object::Bool(left <= right),
             Infix::GreaterThan => Object::Bool(left > right),
@@ -275,6 +286,7 @@ impl Eval {
         self.env = Rc::new(RefCell::new(extended_env));
         let evaluated = self.eval_block_statement(body);
         self.env = current_env;
+        //println!("{:#?}", self.env);
         self.unwrap_return_value(evaluated)
     }
 
@@ -292,6 +304,19 @@ impl Eval {
         }
 
         scope_env
+    }
+
+    fn extend_global_env(&mut self, lib: String) -> Option<Object> {
+        let lib_env = match load_lib(lib.clone()) {
+            Some(e) => e,
+            None => return Some(Object::Error(format!("Could not load lib: {}", lib))),
+        };
+        let mut new_env = Env::new_enclosed(self.env.clone());
+        for (k, v) in lib_env {
+            new_env.set(k, v);
+        }
+        self.env = Rc::new(RefCell::new(new_env));
+        None
     }
 
     fn unwrap_return_value(&mut self, obj: Option<Object>) -> Object {

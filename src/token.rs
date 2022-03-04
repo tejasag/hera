@@ -16,6 +16,7 @@ pub enum Token {
     Bang,
     Asterisk,
     Slash,
+    Percent,
 
     Lt,
     Gt,
@@ -39,6 +40,7 @@ pub enum Token {
     If,
     Else,
     Return,
+    Import,
 }
 
 impl fmt::Display for Token {

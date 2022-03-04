@@ -27,6 +27,7 @@ pub enum Infix {
     Divide,
     Multiply,
     Equal,
+    Modulus,
     NotEqual,
     GreaterThanEqual,
     GreaterThan,
@@ -41,6 +42,7 @@ impl fmt::Display for Infix {
             Infix::Minus => write!(f, "-"),
             Infix::Divide => write!(f, "/"),
             Infix::Multiply => write!(f, "*"),
+            Infix::Modulus => write!(f, "%"),
             Infix::Equal => write!(f, "=="),
             Infix::NotEqual => write!(f, "!="),
             Infix::GreaterThanEqual => write!(f, ">="),
@@ -89,6 +91,7 @@ pub enum Statement {
     Let(Ident, Expression),
     Return(Expression),
     Expression(Expression),
+    Import(Ident),
 }
 
 #[derive(PartialEq, Clone, Debug)]

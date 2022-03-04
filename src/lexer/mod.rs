@@ -14,6 +14,7 @@ lazy_static::lazy_static! {
         keywords.insert("if", Token::If);
         keywords.insert("else", Token::Else);
         keywords.insert("return", Token::Return);
+        keywords.insert("import", Token::Import);
         keywords
     };
 }
@@ -71,6 +72,7 @@ impl Lexer {
             ',' => Token::Comma,
             '+' => Token::Plus,
             '-' => Token::Minus,
+            '%' => Token::Percent,
             '!' => {
                 if self.peek_char() == '=' {
                     self.read_char();

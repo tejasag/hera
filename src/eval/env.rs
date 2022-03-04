@@ -3,8 +3,8 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Env {
-    store: HashMap<String, Object>,
-    outer: Option<Rc<RefCell<Env>>>,
+    pub store: HashMap<String, Object>,
+    pub outer: Option<Rc<RefCell<Env>>>,
 }
 
 impl Env {

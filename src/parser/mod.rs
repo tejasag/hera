@@ -34,7 +34,7 @@ impl Parser {
             Token::Lt | Token::LtEq => Precedence::LessGreater,
             Token::Gt | Token::GtEq => Precedence::LessGreater,
             Token::Plus | Token::Minus => Precedence::Sum,
-            Token::Slash | Token::Asterisk => Precedence::Product,
+            Token::Slash | Token::Asterisk | Token::Percent => Precedence::Product,
             Token::LBracket => Precedence::Index,
             Token::LParen => Precedence::Call,
             _ => Precedence::Lowest,
@@ -57,6 +57,7 @@ impl Parser {
         match self.current_token {
             Token::Let => self.parse_let_statement(),
             Token::Return => self.parse_return_statement(),
+            Token::Import => self.parse_import_statement(),
             // _ => panic!("Illegal token found."),
             _ => self.parse_expression_statement(),
         }
@@ -121,6 +122,19 @@ impl Parser {
         Some(Statement::Return(exp))
     }
 
+    pub fn parse_import_statement(&mut self) -> Option<Statement> {
+        self.next_token();
+
+        let lib = match self.current_token {
+            Token::Ident(ref mut ident) => ident.clone(),
+            _ => return None,
+        };
+        while !self.current_token_is(Token::SemiColon) {
+            self.next_token();
+        }
+        Some(Statement::Import(Ident(lib)))
+    }
+
     fn parse_block_statement(&mut self) -> BlockStatement {
         self.next_token();
 
@@ -161,6 +175,7 @@ impl Parser {
                 | Token::Asterisk
                 | Token::Equal
                 | Token::Slash
+                | Token::Percent
                 | Token::NotEq
                 | Token::Lt
                 | Token::LtEq
@@ -268,6 +283,7 @@ impl Parser {
             Token::Minus => Infix::Minus,
             Token::Slash => Infix::Divide,
             Token::Asterisk => Infix::Multiply,
+            Token::Percent => Infix::Modulus,
             Token::Equal => Infix::Equal,
             Token::NotEq => Infix::NotEqual,
             Token::Lt => Infix::LessThan,
