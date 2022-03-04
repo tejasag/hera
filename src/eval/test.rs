@@ -287,7 +287,7 @@ fn test_builtin_functions() {
         (
             "len(1)",
             Some(Object::Error(
-                "argument to `len` not supported, got 1".to_string(),
+                "argument to `len` not supported, got: 1".to_string(),
             )),
         ),
         (
