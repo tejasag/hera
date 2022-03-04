@@ -39,12 +39,11 @@ fn main() {
         }
         let res = evaluator.eval(program);
 
-        match res {
-            Some(o) => match o {
+        if let Some(o) = res {
+            match o {
                 Object::Null => (),
                 _ => println!("{}", o),
-            },
-            None => (),
+            }
         }
         return;
     }
