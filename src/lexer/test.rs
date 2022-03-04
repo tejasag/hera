@@ -27,6 +27,7 @@ if (5 < 10) {
 let result = add(five, ten);
 \"foobar\"
 \"foo bar\"
+[1,2];
 ";
 
     let tests: Vec<Token> = vec![
@@ -105,6 +106,12 @@ let result = add(five, ten);
         SemiColon,
         Str(String::from("foobar")),
         Str(String::from("foo bar")),
+        LBracket,
+        Int(1),
+        Comma,
+        Int(2),
+        RBracket,
+        SemiColon,
     ];
 
     let mut l = Lexer::new(input.to_string());

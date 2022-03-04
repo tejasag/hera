@@ -35,7 +35,7 @@ impl Parser {
             Token::Gt | Token::GtEq => Precedence::LessGreater,
             Token::Plus | Token::Minus => Precedence::Sum,
             Token::Slash | Token::Asterisk => Precedence::Product,
-            Token::LBrace => Precedence::Index,
+            Token::LBracket => Precedence::Index,
             Token::LParen => Precedence::Call,
             _ => Precedence::Lowest,
         }
@@ -141,6 +141,7 @@ impl Parser {
             Token::Int(_) => self.parse_int_literal(),
             Token::Bool(_) => self.parse_bool_literal(),
             Token::Str(_) => self.parse_string_literal(),
+            Token::LBracket => self.parse_array_literal(),
             Token::Ident(_) => self.parse_ident(),
             Token::Bang | Token::Minus | Token::Plus => self.parse_prefix_expression(),
             Token::LParen => self.parse_grouped_expression(),
@@ -172,6 +173,10 @@ impl Parser {
                     self.next_token();
                     left = self.parse_call_expression(left.unwrap());
                 }
+                Token::LBracket => {
+                    self.next_token();
+                    left = self.parse_index_expression(left.unwrap());
+                }
                 _ => return left,
             }
         }
@@ -198,6 +203,42 @@ impl Parser {
             Token::Str(ref mut str) => Some(Expression::Literal(Literal::String(str.clone()))),
             _ => None,
         }
+    }
+
+    fn parse_array_literal(&mut self) -> Option<Expression> {
+        match self.parse_expression_list(Token::RBracket) {
+            Some(list) => Some(Expression::Literal(Literal::Array(list))),
+            None => None,
+        }
+    }
+
+    fn parse_expression_list(&mut self, end: Token) -> Option<Vec<Expression>> {
+        let mut list = vec![];
+        if self.peek_token_is(&end) {
+            self.next_token();
+            return Some(list);
+        }
+
+        self.next_token();
+        match self.parse_expression(Precedence::Lowest) {
+            Some(a) => list.push(a),
+            None => return None,
+        };
+        while self.peek_token_is(&Token::Comma) {
+            self.next_token();
+            self.next_token();
+
+            match self.parse_expression(Precedence::Lowest) {
+                Some(expr) => list.push(expr),
+                None => return None,
+            }
+        }
+
+        if !self.expect_peek(end) {
+            return None;
+        }
+
+        Some(list)
     }
 
     fn parse_ident(&mut self) -> Option<Expression> {
@@ -375,6 +416,22 @@ impl Parser {
         }
 
         Some(args)
+    }
+
+    fn parse_index_expression(&mut self, left: Expression) -> Option<Expression> {
+        self.next_token();
+        let expr = match self.parse_expression(Precedence::Lowest) {
+            Some(e) => e,
+            None => return None,
+        };
+        if !self.expect_peek(Token::RBracket) {
+            return None;
+        }
+
+        Some(Expression::Index {
+            left: Box::new(left),
+            index: Box::new(expr),
+        })
     }
 
     fn peek_token_is(&self, t: &Token) -> bool {

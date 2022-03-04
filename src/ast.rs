@@ -56,6 +56,7 @@ pub enum Literal {
     String(String),
     Int(i32),
     Bool(bool),
+    Array(Vec<Expression>),
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -76,6 +77,10 @@ pub enum Expression {
     Call {
         function: Box<Expression>,
         args: Vec<Expression>,
+    },
+    Index {
+        left: Box<Expression>,
+        index: Box<Expression>,
     },
 }
 

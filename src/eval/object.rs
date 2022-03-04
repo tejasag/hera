@@ -14,6 +14,7 @@ pub enum Object {
     Error(String),
     Fn(Vec<Ident>, BlockStatement, Rc<RefCell<Env>>),
     Builtin(BuiltlnFn),
+    Array(Vec<Object>),
 }
 
 impl fmt::Display for Object {
@@ -37,6 +38,17 @@ impl fmt::Display for Object {
                 write!(f, "fn({}) {{ ... }}", result)
             }
             Object::Builtin(_) => write!(f, "[builtin fn]"),
+            Object::Array(ref val) => {
+                let mut result = String::new();
+                for (i, obj) in val.iter().enumerate() {
+                    if i < 1 {
+                        result.push_str(&format!("{}", obj));
+                    } else {
+                        result.push_str(&format!(", {}", obj));
+                    }
+                }
+                write!(f, "[{}]", result)
+            }
         }
     }
 }

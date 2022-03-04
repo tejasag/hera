@@ -126,6 +126,15 @@ impl Eval {
             }
             Expression::Fn { params, body } => Some(Object::Fn(params, body, self.env.clone())),
             Expression::Call { function, args } => Some(self.eval_call_expr(*function, args)),
+            Expression::Index { left, index } => {
+                let arr = self.eval_expr(*left);
+                let i = self.eval_expr(*index);
+                if arr.is_some() && i.is_some() {
+                    Some(self.eval_index_expr(arr.unwrap(), i.unwrap()))
+                } else {
+                    None
+                }
+            }
         }
     }
 
@@ -214,6 +223,37 @@ impl Eval {
         self.apply_function(function, args)
     }
 
+    fn eval_index_expr(&mut self, left: Object, index: Object) -> Object {
+        match left {
+            Object::Array(ref arr) => {
+                if let Object::Int(i) = index {
+                    self.eval_array_index_expr(arr.clone(), i)
+                } else {
+                    Object::Error(format!("index operator not supported: {}", left))
+                }
+            }
+            _ => Object::Error(format!("unknown operator: {} {}", left, index)),
+        }
+    }
+
+    fn eval_array_index_expr(&mut self, array: Vec<Object>, index: i32) -> Object {
+        let max = array.len() as i32;
+        if index > max {
+            return Object::Null;
+        }
+
+        if index < 0 {
+            match array.get((array.len() as i32 + index) as usize) {
+                Some(o) => return o.clone(),
+                None => return Object::Null,
+            }
+        }
+        match array.get(index as usize) {
+            Some(o) => o.clone(),
+            None => Object::Null,
+        }
+    }
+
     fn apply_function(&mut self, function: Expression, args: Vec<Object>) -> Object {
         let (params, body, env) = match self.eval_expr(function) {
             Some(Object::Fn(params, body, env)) => (params, body, env),
@@ -279,6 +319,11 @@ impl Eval {
             Literal::String(s) => Object::String(s),
             Literal::Int(i) => Object::Int(i),
             Literal::Bool(b) => Object::Bool(b),
+            Literal::Array(a) => Object::Array(
+                a.iter()
+                    .map(|e| self.eval_expr(e.clone()).unwrap_or(Object::Null))
+                    .collect::<Vec<_>>(),
+            ),
         }
     }
 }

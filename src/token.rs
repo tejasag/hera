@@ -31,6 +31,8 @@ pub enum Token {
     LParen,
     LBrace,
     RBrace,
+    LBracket,
+    RBracket,
 
     Function,
     Let,

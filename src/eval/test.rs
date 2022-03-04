@@ -7,19 +7,21 @@ use crate::{
     parser::Parser,
 };
 
-fn test(tests: Vec<(&str, Option<Object>)>) {
-    for (input, expect) in tests {
-        let result = Eval::new(Rc::new(RefCell::new(Env::new())))
-            .eval(Parser::new(Lexer::new(input.to_string())).parse_program());
-
-        assert_eq!(result, expect);
-    }
+#[macro_export]
+macro_rules! test {
+    ($x:expr) => {
+        for (input, expect) in $x {
+            let result = Eval::new(Rc::new(RefCell::new(Env::new())))
+                .eval(Parser::new(Lexer::new(input.to_string())).parse_program());
+            assert_eq!(result, expect)
+        }
+    };
 }
 
 #[test]
 fn test_int_eval() {
     let tests = vec![("5", Some(Object::Int(5))), ("10", Some(Object::Int(10)))];
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -29,7 +31,7 @@ fn test_bool_eval() {
         ("false", Some(Object::Bool(false))),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -41,7 +43,7 @@ fn test_string_eval() {
         ),
         ("\"foobar\"", Some(Object::String(String::from("foobar")))),
     ];
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -56,7 +58,7 @@ fn test_string_concatenation_eval() {
             Some(Object::String(String::from("Foo Bar"))),
         ),
     ];
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -67,7 +69,7 @@ fn test_not_prefix_eval() {
         ("!1", Some(Object::Bool(false))),
     ];
 
-    test(tests);
+    test!(tests);
 }
 #[test]
 fn test_minus_prefix_eval() {
@@ -76,7 +78,7 @@ fn test_minus_prefix_eval() {
         ("-3498", Some(Object::Int(-3498))),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -95,7 +97,7 @@ fn test_int_infix_eval() {
         ("(5 + 10 * 2 + 15 / 3) * 2 + -10", Some(Object::Int(50))),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -114,7 +116,7 @@ fn test_if_eval() {
         ("if (1 <= 2) { 10 } else { 20 }", Some(Object::Int(10))),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -136,7 +138,7 @@ if (10 > 1) {
         ),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -207,7 +209,7 @@ fn test_error_handling() {
         ),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -222,7 +224,7 @@ fn test_let_statements() {
         ),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -240,7 +242,7 @@ fn test_fn_object() {
         )),
     )];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -273,7 +275,7 @@ fn test_fn_application() {
         ),
     ];
 
-    test(tests);
+    test!(tests);
 }
 
 #[test]
@@ -295,5 +297,45 @@ fn test_builtin_functions() {
             ))),
         ),
     ];
-    test(tests);
+    test!(tests);
+}
+
+#[test]
+fn test_array_eval() {
+    let tests = vec![(
+        "[1, 2 * 2, 3 + 3]",
+        Some(Object::Array(vec![
+            Object::Int(1),
+            Object::Int(4),
+            Object::Int(6),
+        ])),
+    )];
+    test!(tests);
+}
+
+#[test]
+fn test_array_index_eval() {
+    let tests = vec![
+        ("[1,2,3][0]", Some(Object::Int(1))),
+        ("[1,2,3][1]", Some(Object::Int(2))),
+        ("[1,2,3][2]", Some(Object::Int(3))),
+        ("let i = 0; [1][i]", Some(Object::Int(1))),
+        ("let arr = [1,2,3]; arr[2];", Some(Object::Int(3))),
+        ("[1,2,3][1+1]", Some(Object::Int(3))),
+        (
+            "let arr = [1,2,3]; arr[1] + arr[0] + arr[2]",
+            Some(Object::Int(6)),
+        ),
+        (
+            "let arr = [1,2,3]; let i = arr[0]; arr[i]",
+            Some(Object::Int(2)),
+        ),
+        ("[1,2,3][3]", Some(Object::Null)),
+        ("[1,2,3][-1]", Some(Object::Int(3))),
+        (
+            "let arr = [1,2,3]; arr[-1 * (arr[1] - arr[0])]",
+            Some(Object::Int(3)),
+        ),
+    ];
+    test!(tests);
 }

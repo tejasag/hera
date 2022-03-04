@@ -469,6 +469,30 @@ fn test_operator_precedence_parsing() {
                 )),
             )),
         ),
+        (
+            "a * [1, 2, 3, 4][b * c] * d",
+            Statement::Expression(Expression::Infix(
+                Infix::Multiply,
+                Box::new(Expression::Infix(
+                    Infix::Multiply,
+                    Box::new(Expression::Ident(Ident(String::from("a")))),
+                    Box::new(Expression::Index {
+                        left: Box::new(Expression::Literal(Literal::Array(vec![
+                            Expression::Literal(Literal::Int(1)),
+                            Expression::Literal(Literal::Int(2)),
+                            Expression::Literal(Literal::Int(3)),
+                            Expression::Literal(Literal::Int(4)),
+                        ]))),
+                        index: Box::new(Expression::Infix(
+                            Infix::Multiply,
+                            Box::new(Expression::Ident(Ident(String::from("b")))),
+                            Box::new(Expression::Ident(Ident(String::from("c")))),
+                        )),
+                    }),
+                )),
+                Box::new(Expression::Ident(Ident(String::from("d")))),
+            )),
+        ),
     ];
 
     for (input, expect) in tests {
@@ -720,6 +744,57 @@ pub fn test_call_expression() {
                     Box::new(Expression::Literal(Literal::Int(4))),
                 ),
             ],
+        }),
+    )];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+
+        check_parse_errors(parser);
+        assert_eq!(vec![expect], program.statements);
+    }
+}
+
+#[test]
+pub fn test_array_literal() {
+    let tests: Vec<(&str, Statement)> = vec![(
+        "[1, 2 * 2, 3+3]",
+        Statement::Expression(Expression::Literal(Literal::Array(vec![
+            Expression::Literal(Literal::Int(1)),
+            Expression::Infix(
+                Infix::Multiply,
+                Box::new(Expression::Literal(Literal::Int(2))),
+                Box::new(Expression::Literal(Literal::Int(2))),
+            ),
+            Expression::Infix(
+                Infix::Plus,
+                Box::new(Expression::Literal(Literal::Int(3))),
+                Box::new(Expression::Literal(Literal::Int(3))),
+            ),
+        ]))),
+    )];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+
+        check_parse_errors(parser);
+        assert_eq!(vec![expect], program.statements);
+    }
+}
+
+#[test]
+pub fn test_index_expression() {
+    let tests = vec![(
+        "myArray[1+2]",
+        Statement::Expression(Expression::Index {
+            left: Box::new(Expression::Ident(Ident(String::from("myArray")))),
+            index: Box::new(Expression::Infix(
+                Infix::Plus,
+                Box::new(Expression::Literal(Literal::Int(1))),
+                Box::new(Expression::Literal(Literal::Int(2))),
+            )),
         }),
     )];
 
