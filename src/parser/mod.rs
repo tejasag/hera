@@ -221,10 +221,7 @@ impl Parser {
     }
 
     fn parse_array_literal(&mut self) -> Option<Expression> {
-        match self.parse_expression_list(Token::RBracket) {
-            Some(list) => Some(Expression::Literal(Literal::Array(list))),
-            None => None,
-        }
+        self.parse_expression_list(Token::RBracket).map(|list| Expression::Literal(Literal::Array(list)))
     }
 
     fn parse_expression_list(&mut self, end: Token) -> Option<Vec<Expression>> {

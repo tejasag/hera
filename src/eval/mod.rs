@@ -71,10 +71,7 @@ impl Eval {
             }
             Statement::Import(i) => {
                 let Ident(lib) = i;
-                match self.extend_global_env(lib) {
-                    Some(o) => Some(o),
-                    None => return None,
-                }
+                self.extend_global_env(lib)
             }
         }
     }
