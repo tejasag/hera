@@ -58,6 +58,7 @@ impl Parser {
             Token::Let => self.parse_let_statement(),
             Token::Return => self.parse_return_statement(),
             Token::Import => self.parse_import_statement(),
+            Token::Update => self.parse_update_statement(),
             // _ => panic!("Illegal token found."),
             _ => self.parse_expression_statement(),
         }
@@ -105,6 +106,38 @@ impl Parser {
         }
 
         Some(Statement::Let(name, lit))
+    }
+
+    pub fn parse_update_statement(&mut self) -> Option<Statement> {
+        match &self.peek_token {
+            Token::Ident(_) => self.next_token(),
+            _ => {
+                self.peek_error(Token::Ident(String::new()));
+                return None;
+            }
+        }
+
+        let name: Ident = match self.parse_ident() {
+            Some(Expression::Ident(ref mut s)) => s.clone(),
+            _ => return None,
+        };
+
+        if !self.expect_peek(Token::Assign) {
+            return None;
+        }
+
+        self.next_token();
+
+        let lit: Expression = match self.parse_expression(Precedence::Lowest) {
+            Some(e) => e,
+            None => return None,
+        };
+
+        while !self.current_token_is(Token::SemiColon) {
+            self.next_token();
+        }
+
+        Some(Statement::Update(name, lit))
     }
 
     pub fn parse_return_statement(&mut self) -> Option<Statement> {

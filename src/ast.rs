@@ -90,6 +90,7 @@ pub enum Expression {
 #[derive(PartialEq, Clone, Debug)]
 pub enum Statement {
     Let(Ident, Expression),
+    Update(Ident, Expression),
     Return(Expression),
     Expression(Expression),
     Import(Ident),

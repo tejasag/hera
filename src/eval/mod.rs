@@ -69,6 +69,25 @@ impl Eval {
                     None
                 }
             }
+            Statement::Update(i, v) => {
+                let Ident(name) = i;
+                let val = match self.eval_expr(v) {
+                    Some(value) => value,
+                    None => return None,
+                };
+                if self.is_error(&val) {
+                    Some(val)
+                } else {
+                    let mut env = self.env.borrow_mut();
+                    match env.get(&name) {
+                        Some(_) => {
+                            env.update(name, val);
+                            None
+                        }
+                        None => Some(Object::Error(format!("identifier not found: {}", name))),
+                    }
+                }
+            }
             Statement::Import(i) => {
                 let Ident(lib) = i;
                 self.extend_global_env(lib)

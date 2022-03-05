@@ -19,7 +19,7 @@ hera
 
 ### Variable declaration
 
-**All declaration statements should end with a `;`!**
+> **All declaration statements should end with a `;`!**
 
 ```
 let name = value;
@@ -34,6 +34,17 @@ let b = true;
 
 # integer
 let c = 10;
+```
+
+### Updating variables
+
+```
+update name = value;
+```
+
+```
+let a = 10;
+update a = 15;
 ```
 
 ### Arrays
@@ -144,6 +155,20 @@ let double = fn(x) {
 let new = map(array, double);
 
 # new = [4,6,8,10]
+```
+
+`while(condition, body)` - A while loop that runs the body till the condition is true
+
+Example:
+
+```
+let i = 1;
+
+let condition = fn() { i < 15 };
+while(condition, fn() {
+    print(i);
+    update i = i+1;
+});
 ```
 
 `first(array)` - Returns the first element of an array <br>

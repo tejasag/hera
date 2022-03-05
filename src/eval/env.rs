@@ -42,6 +42,23 @@ impl Env {
     pub fn set(&mut self, name: String, val: Object) -> Option<Object> {
         self.store.insert(name, val)
     }
+
+    pub fn update(&mut self, name: String, val: Object) -> Option<Object> {
+        match self.store.get(&name) {
+            Some(e) => self.store.insert(name, val),
+            None => {
+                if let Some(ref o) = self.outer {
+                    let mut outer = o.borrow_mut();
+                    match outer.get(&name) {
+                        Some(_) => outer.update(name, val),
+                        None => None,
+                    }
+                } else {
+                    None
+                }
+            }
+        }
+    }
 }
 
 impl Default for Env {

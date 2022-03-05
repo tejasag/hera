@@ -38,6 +38,7 @@ pub enum Token {
 
     Function,
     Let,
+    Update,
     If,
     Else,
     Return,
