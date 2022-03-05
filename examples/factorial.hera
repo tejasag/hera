@@ -1,0 +1,9 @@
+let factorial = fn(x) {
+    let i = 1;
+    if(x > 1) {
+        update i = x * factorial(x - 1);
+    }
+    i
+};
+
+print(factorial(10));

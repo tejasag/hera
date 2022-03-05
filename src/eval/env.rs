@@ -45,7 +45,7 @@ impl Env {
 
     pub fn update(&mut self, name: String, val: Object) -> Option<Object> {
         match self.store.get(&name) {
-            Some(e) => self.store.insert(name, val),
+            Some(_) => self.store.insert(name, val),
             None => {
                 if let Some(ref o) = self.outer {
                     let mut outer = o.borrow_mut();

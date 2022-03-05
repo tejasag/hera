@@ -171,5 +171,7 @@ while(condition, fn() {
 });
 ```
 
+`range(limit)` - Returns an array with numbers from 1 to limit <br>
+`abs(num)` - Returns a positive variant of the given negative or postive number <br>
 `first(array)` - Returns the first element of an array <br>
 `last(array)` - Returns the last element of an array

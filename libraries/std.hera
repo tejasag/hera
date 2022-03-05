@@ -21,3 +21,21 @@ let while = fn(condition, body) {
         while(condition, body);
     } 
 };
+
+let range = fn(x) {
+    let res = [];
+    let i = 1;
+    let con = fn() { i <= x };
+    while(con, fn() {
+        update res = push(res, i);
+        update i = i + 1;
+    });
+    res
+};
+
+let abs = fn(x) {
+    if (x < 0) {
+        -x
+    }
+    +x
+};

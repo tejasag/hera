@@ -1,9 +1,0 @@
-import std;
-
-let people = [
-    {"name": "John", "age": 30},
-    {"name": "Doe", "age": 14},
-];
-
-let getName = fn(person) { person["name"] };
-print(map(people, getName));
