@@ -16,7 +16,6 @@ impl fmt::Display for Prefix {
             Prefix::Plus => write!(f, "+"),
             Prefix::Minus => write!(f, "-"),
             Prefix::Not => write!(f, "!"),
-            Prefix::Increment => write!(f, "++"),
         }
     }
 }
