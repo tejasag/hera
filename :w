@@ -53,17 +53,12 @@ arr[-1] # --> 4
 
 ```
 let hash = {
-    "one": "Hello",
-    "two": "World!",
-    3: "number as key",
-    3+4: "my key is 7",
-    true: "my key is a boolean"
+"one": "Hello",
+"two": "World!",
+3: "number as key",
+3+4: "my key is 7",
+true: "my key is a boolean"
 };
-
-hash["one"] # "Hello"
-hash[3] # "number as key"
-hash[7] # "my key is 7"
-hash[true] # "my key is boolean"
 
 ```
 
@@ -72,7 +67,7 @@ hash[true] # "my key is boolean"
 ```
 
 let name = fn(<params>) {
-    <body>
+<body>
 };
 
 ```
@@ -80,10 +75,8 @@ let name = fn(<params>) {
 ```
 
 let double = fn(x) {
-    x * 2
+x \* 2
 };
-
-double(10) # 20
 
 ```
 
@@ -94,15 +87,15 @@ You can directly put the expression or value to return **without any keyword or 
 ```
 
 if (<condition>) {
-    <body>
+<body>
 }
 
 else {
-    <body>
+<body>
 }
 
 else if (<condition>) {
-    <body>
+<body>
 }
 
 ```
@@ -110,11 +103,11 @@ else if (<condition>) {
 ```
 
 if (3 > 4) {
-    print("wtf");
+print("wtf");
 } else if (4 > 3) {
-    print("correct lol");
+print("correct lol");
 } else {
-    print("idk man");
+print("idk man");
 }
 
 ```
@@ -152,7 +145,7 @@ Example:
 
 let array = [2,3,4,5];
 let double = fn(x) {
-    x \* 2
+x \* 2
 };
 
 let new = map(array, double);
@@ -163,3 +156,7 @@ let new = map(array, double);
 
 `first(array)` - Returns the first element of an array <br>
 `last(array)` - Returns the last element of an array
+
+```
+
+```
