@@ -4,7 +4,6 @@ Hera is a simple programming language made to learn more about interpreters and 
 
 ![build status](https://github.com/tejasag/hera/actions/workflows/build.yml/badge.svg)
 ![test status](https://github.com/tejasag/hera/actions/workflows/test.yml/badge.svg)
-![lint status](https://github.com/tejasag/hera/actions/workflows/lint.yml/badge.svg)
 
 ## Usage
 
@@ -70,21 +69,17 @@ hash[true] # "my key is boolean"
 ### Functions
 
 ```
-
 let name = fn(<params>) {
     <body>
 };
-
 ```
 
 ```
-
 let double = fn(x) {
     x * 2
 };
 
 double(10) # 20
-
 ```
 
 You can directly put the expression or value to return **without any keyword or semicolon** or use `return x * 2;`
@@ -92,7 +87,6 @@ You can directly put the expression or value to return **without any keyword or 
 ### Conditions
 
 ```
-
 if (<condition>) {
     <body>
 }
@@ -104,11 +98,9 @@ else {
 else if (<condition>) {
     <body>
 }
-
 ```
 
 ```
-
 if (3 > 4) {
     print("wtf");
 } else if (4 > 3) {
@@ -116,7 +108,6 @@ if (3 > 4) {
 } else {
     print("idk man");
 }
-
 ```
 
 ### Imports
@@ -124,15 +115,11 @@ if (3 > 4) {
 The only library currently available is `std`
 
 ```
-
 import <lib>;
-
 ```
 
 ```
-
 import std;
-
 ```
 
 ## BuiltIn Functions
@@ -149,7 +136,6 @@ import std;
 Example:
 
 ```
-
 let array = [2,3,4,5];
 let double = fn(x) {
     x \* 2
@@ -158,7 +144,6 @@ let double = fn(x) {
 let new = map(array, double);
 
 # new = [4,6,8,10]
-
 ```
 
 `first(array)` - Returns the first element of an array <br>

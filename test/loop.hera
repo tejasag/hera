@@ -1,0 +1,10 @@
+import std;
+
+let i = 1;
+
+while(i < 10, fn() {
+    print(i);
+    let i = i+ 1;
+});
+
+

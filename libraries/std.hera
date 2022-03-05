@@ -14,3 +14,11 @@ let map = fn (arr, f) {
 let first = fn (arr) { arr[0] };
 
 let last = fn (arr) { arr[-1] };
+
+let while = fn(condition, func) {
+   if(condition == true) {
+      func();
+      while(condition, func);
+   } 
+};
+

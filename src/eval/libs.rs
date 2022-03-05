@@ -5,7 +5,7 @@ use std::{cell::RefCell, collections::HashMap, fs, rc::Rc};
 pub fn load_lib(lib: String) -> Option<HashMap<String, Object>> {
     let libs = vec!["std"];
     let mut methods = HashMap::new();
-    methods.insert("std", vec!["map", "first", "last"]);
+    methods.insert("std", vec!["map", "first", "last", "while"]);
 
     if !libs.contains(&lib.as_str()) {
         return None;
