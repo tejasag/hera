@@ -59,6 +59,7 @@ pub enum Literal {
     Int(i32),
     Bool(bool),
     Array(Vec<Expression>),
+    Hash(Vec<(Expression, Expression)>),
 }
 
 #[derive(PartialEq, Clone, Debug)]

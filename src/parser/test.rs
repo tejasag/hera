@@ -806,3 +806,67 @@ pub fn test_index_expression() {
         assert_eq!(vec![expect], program.statements);
     }
 }
+
+#[test]
+pub fn test_hash_literal() {
+    let tests = vec![
+        (
+            "{\"one\": 1, \"two\": 2, \"three\": 3}",
+            Statement::Expression(Expression::Literal(Literal::Hash(vec![
+                (
+                    Expression::Literal(Literal::String(String::from("one"))),
+                    Expression::Literal(Literal::Int(1)),
+                ),
+                (
+                    Expression::Literal(Literal::String(String::from("two"))),
+                    Expression::Literal(Literal::Int(2)),
+                ),
+                (
+                    Expression::Literal(Literal::String(String::from("three"))),
+                    Expression::Literal(Literal::Int(3)),
+                ),
+            ]))),
+        ),
+        (
+            "{}",
+            Statement::Expression(Expression::Literal(Literal::Hash(vec![]))),
+        ),
+        (
+            "{\"one\": 0 + 1, \"two\": 10 - 8, \"three\": 15 / 5}",
+            Statement::Expression(Expression::Literal(Literal::Hash(vec![
+                (
+                    Expression::Literal(Literal::String(String::from("one"))),
+                    Expression::Infix(
+                        Infix::Plus,
+                        Box::new(Expression::Literal(Literal::Int(0))),
+                        Box::new(Expression::Literal(Literal::Int(1))),
+                    ),
+                ),
+                (
+                    Expression::Literal(Literal::String(String::from("two"))),
+                    Expression::Infix(
+                        Infix::Minus,
+                        Box::new(Expression::Literal(Literal::Int(10))),
+                        Box::new(Expression::Literal(Literal::Int(8))),
+                    ),
+                ),
+                (
+                    Expression::Literal(Literal::String(String::from("three"))),
+                    Expression::Infix(
+                        Infix::Divide,
+                        Box::new(Expression::Literal(Literal::Int(15))),
+                        Box::new(Expression::Literal(Literal::Int(5))),
+                    ),
+                ),
+            ]))),
+        ),
+    ];
+
+    for (input, expect) in tests {
+        let mut parser = Parser::new(Lexer::new(input.to_string()));
+        let program = parser.parse_program();
+
+        check_parse_errors(parser);
+        assert_eq!(vec![expect], program.statements);
+    }
+}

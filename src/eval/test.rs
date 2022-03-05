@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use super::{env::Env, object::Object, Eval};
 use crate::{
@@ -11,8 +11,8 @@ use crate::{
 macro_rules! test {
     ($x:expr) => {
         for (input, expect) in $x {
-            let result = Eval::new(Rc::new(RefCell::new(Env::new())))
-                .eval(Parser::new(Lexer::new(input.to_string())).parse_program());
+            let parser = Parser::new(Lexer::new(input.to_string())).parse_program();
+            let result = Eval::new(Rc::new(RefCell::new(Env::new()))).eval(parser);
             assert_eq!(result, expect)
         }
     };
@@ -207,6 +207,12 @@ fn test_error_handling() {
             "foobar",
             Some(Object::Error(String::from("identifier not found: foobar"))),
         ),
+        (
+            "{true: \"owo\"}[fn(x) {x}];",
+            Some(Object::Error(String::from(
+                "unsable as hash key: fn(x) { ... }",
+            ))),
+        ),
     ];
 
     test!(tests);
@@ -336,6 +342,45 @@ fn test_array_index_eval() {
             "let arr = [1,2,3]; arr[-1 * (arr[1] - arr[0])]",
             Some(Object::Int(3)),
         ),
+    ];
+    test!(tests);
+}
+
+#[test]
+fn test_hash_literal() {
+    let mut hash = HashMap::new();
+    hash.insert(Object::String(String::from("one")), Object::Int(1));
+    hash.insert(Object::String(String::from("two")), Object::Int(2));
+    hash.insert(Object::String(String::from("three")), Object::Int(3));
+    hash.insert(Object::Int(4), Object::Int(4));
+    hash.insert(Object::Bool(true), Object::Int(5));
+    hash.insert(Object::Bool(false), Object::Int(6));
+    let tests = vec![(
+        r#"
+        let two = "two";
+        {
+            "one": 10 - 9,
+            two: 1+1,
+            "thr" + "ee": 6/2,
+            4:4,
+            true: 5,
+            false: 6
+        }
+        "#,
+        Some(Object::Hash(hash)),
+    )];
+    test!(tests);
+}
+
+#[test]
+fn test_hash_index_expression() {
+    let tests = vec![
+        ("{\"foo\": 3}[\"foo\"]", Some(Object::Int(3))),
+        ("{\"foo\": 3}[\"bar\"]", Some(Object::Null)),
+        ("let key = \"foo\"; {\"foo\": 3}[key]", Some(Object::Int(3))),
+        ("{}[\"foo\"]", Some(Object::Null)),
+        ("{5:4}[5]", Some(Object::Int(4))),
+        ("{true: 3}[true]", Some(Object::Int(3))),
     ];
     test!(tests);
 }

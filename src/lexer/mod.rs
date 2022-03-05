@@ -63,6 +63,7 @@ impl Lexer {
                 }
             }
             ';' => Token::SemiColon,
+            ':' => Token::Colon,
             '(' => Token::LParen,
             ')' => Token::RParen,
             '{' => Token::LBrace,

@@ -28,6 +28,7 @@ let result = add(five, ten);
 \"foobar\"
 \"foo bar\"
 [1,2];
+{\"foo\": \"bar\"};
 ";
 
     let tests: Vec<Token> = vec![
@@ -111,6 +112,12 @@ let result = add(five, ten);
         Comma,
         Int(2),
         RBracket,
+        SemiColon,
+        LBrace,
+        Str(String::from("foo")),
+        Colon,
+        Str(String::from("bar")),
+        RBrace,
         SemiColon,
     ];
 

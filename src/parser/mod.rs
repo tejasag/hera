@@ -161,6 +161,7 @@ impl Parser {
             Token::LParen => self.parse_grouped_expression(),
             Token::If => self.parse_if_expression(),
             Token::Function => self.parse_fn_expression(),
+            Token::LBrace => self.parse_hash_literal(),
             _ => {
                 // TODO: add function call here
                 None
@@ -221,7 +222,37 @@ impl Parser {
     }
 
     fn parse_array_literal(&mut self) -> Option<Expression> {
-        self.parse_expression_list(Token::RBracket).map(|list| Expression::Literal(Literal::Array(list)))
+        self.parse_expression_list(Token::RBracket)
+            .map(|list| Expression::Literal(Literal::Array(list)))
+    }
+
+    fn parse_hash_literal(&mut self) -> Option<Expression> {
+        let mut hash = vec![];
+        while !self.peek_token_is(&Token::RBrace) {
+            self.next_token();
+            let key = match self.parse_expression(Precedence::Lowest) {
+                Some(o) => o,
+                None => return None,
+            };
+            if !self.expect_peek(Token::Colon) {
+                return None;
+            }
+
+            self.next_token();
+            let val = match self.parse_expression(Precedence::Lowest) {
+                Some(o) => o,
+                None => return None,
+            };
+            hash.push((key, val));
+            if !self.peek_token_is(&Token::RBrace) && !self.expect_peek(Token::Comma) {
+                return None;
+            }
+        }
+        if !self.expect_peek(Token::RBrace) {
+            return None;
+        }
+
+        Some(Expression::Literal(Literal::Hash(hash)))
     }
 
     fn parse_expression_list(&mut self, end: Token) -> Option<Vec<Expression>> {
@@ -238,6 +269,9 @@ impl Parser {
         };
         while self.peek_token_is(&Token::Comma) {
             self.next_token();
+            if self.peek_token_is(&Token::RBracket) {
+                break;
+            }
             self.next_token();
 
             match self.parse_expression(Precedence::Lowest) {
@@ -353,6 +387,7 @@ impl Parser {
             Some(s) => s,
             None => return None,
         };
+        self.next_token();
         let body = self.parse_block_statement();
 
         Some(Expression::Fn { params, body })
@@ -383,6 +418,10 @@ impl Parser {
                 Token::Ident(ref mut ident) => idents.push(Ident(ident.clone())),
                 _ => return None,
             };
+        }
+
+        if !self.expect_peek(Token::RParen) {
+            return None;
         }
 
         Some(idents)

@@ -10,7 +10,7 @@ use crate::ast::*;
 use builtins::new_builtins;
 use env::Env;
 use object::Object;
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use self::libs::load_lib;
 
@@ -240,6 +240,14 @@ impl Eval {
                     Object::Error(format!("index operator not supported: {}", left))
                 }
             }
+            Object::Hash(ref hash) => match index {
+                Object::Int(_) | Object::Bool(_) | Object::String(_) => match hash.get(&index) {
+                    Some(o) => o.clone(),
+                    None => Object::Null,
+                },
+                Object::Error(_) => index,
+                _ => Object::Error(format!("unsable as hash key: {}", index)),
+            },
             _ => Object::Error(format!("unknown operator: {} {}", left, index)),
         }
     }
@@ -346,6 +354,26 @@ impl Eval {
                     .map(|e| self.eval_expr(e.clone()).unwrap_or(Object::Null))
                     .collect::<Vec<_>>(),
             ),
+            Literal::Hash(h) => self.eval_hash_literal(h),
         }
+    }
+
+    fn eval_hash_literal(&mut self, h: Vec<(Expression, Expression)>) -> Object {
+        let mut hash = HashMap::new();
+
+        for (k, v) in h {
+            let key = self.eval_expr(k).unwrap_or(Object::Null);
+            if self.is_error(&key) {
+                return key;
+            }
+
+            let val = self.eval_expr(v).unwrap_or(Object::Null);
+            if self.is_error(&val) {
+                return val;
+            }
+
+            hash.insert(key, val);
+        }
+        Object::Hash(hash)
     }
 }

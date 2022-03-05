@@ -1,6 +1,12 @@
 use super::env::Env;
 use crate::ast::{BlockStatement, Ident};
-use std::{cell::RefCell, fmt, rc::Rc};
+use std::{
+    cell::RefCell,
+    collections::HashMap,
+    fmt,
+    hash::{Hash, Hasher},
+    rc::Rc,
+};
 
 pub type BuiltlnFn = fn(Vec<Object>) -> Object;
 
@@ -15,6 +21,7 @@ pub enum Object {
     Fn(Vec<Ident>, BlockStatement, Rc<RefCell<Env>>),
     Builtin(BuiltlnFn),
     Array(Vec<Object>),
+    Hash(HashMap<Object, Object>),
 }
 
 impl fmt::Display for Object {
@@ -49,6 +56,31 @@ impl fmt::Display for Object {
                 }
                 write!(f, "[{}]", result)
             }
+            Object::Hash(ref hash) => {
+                let mut res = String::new();
+                for (i, (k, v)) in hash.iter().enumerate() {
+                    if i < 1 {
+                        res.push_str(&format!("{}: {}", k, v));
+                    } else {
+                        res.push_str(&format!(", {}: {}", k, v));
+                    }
+                }
+
+                write!(f, "{{{}}}", res)
+            }
+        }
+    }
+}
+
+impl Eq for Object {}
+
+impl Hash for Object {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match *self {
+            Object::Int(ref i) => i.hash(state),
+            Object::Bool(ref b) => b.hash(state),
+            Object::String(ref s) => s.hash(state),
+            _ => "".hash(state),
         }
     }
 }
